@@ -1,0 +1,53 @@
+---
+title: "Index"
+author: "FMJ Bulot (florentin.bulot@centraliens.net)"
+date: "Last generated: `r format(Sys.time(), '%d %B, %Y, %H:%M')`"
+output:
+  html_document:
+    df_print: paged
+    code_folding: hide
+    toc: true
+    toc_depth: 2
+    toc_float:
+      collapsed: false
+knit: (function(inputFile, encoding) { 
+      out_dir <- '../docs/';
+      rmarkdown::render(inputFile,
+                        encoding=encoding, 
+                        output_file=file.path(dirname(inputFile), out_dir, 'index.html'))})
+editor_options: 
+  markdown: 
+    wrap: 80
+---
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(fig.width=12, fig.height=8, fig.path='../docs/figs/index/',warning=FALSE, message=FALSE)
+```
+
+
+
+The underlying code repository is available at: XXXXXXX
+
+
+# How to use this folder
+
+The data needs to be downloaded from <https://doi.org/10.5281/zenodo.7808620>
+and placed in the `data` folder in .rds format. Then the script
+`R/prepare_data.r` must be ran to tidy and collate the different
+datasets used in the study.
+
+
+# Data analysis conducted for the study
+
+The following points have been investigated:
+
+-   time series of the experiment in [Time series](time_series.html)
+
+-   Feature selection on particle number concentration (PNC) in 
+[Feature selection](feature_selection_pnc.html)
+
+-   cross correlation of the different bin sizes in `R/cross_correlation_bin_sizes.R`
+
+-   size distribution of the different experiments in 
+[Size distribution](size_distribution_experiment.html)
+

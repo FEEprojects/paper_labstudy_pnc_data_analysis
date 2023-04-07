@@ -1,0 +1,1296 @@
+---
+title: "Feature selection on PNC"
+author: "FMJ Bulot (florentin.bulot@centraliens.net)"
+date: "Last generated: `r format(Sys.time(), '%d %B, %Y, %H:%M')`"
+output:
+  html_document:
+    df_print: paged
+    code_folding: hide
+    toc: true
+    toc_depth: 2
+    toc_float:
+      collapsed: false
+knit: (function(inputFile, encoding) { 
+      out_dir <- '../docs';
+      rmarkdown::render(inputFile,
+                        encoding=encoding, 
+                        output_file=file.path(dirname(inputFile), out_dir, 'feature_selection_pnc.html'))})
+editor_options: 
+  markdown: 
+    wrap: 80
+---
+
+
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(fig.width=12, fig.height=8, fig.path='../docs/figs/feature_selection_pnc/',warning=FALSE, message=FALSE)
+```
+
+This notebook explores the impact of the following factors on the readings of
+the PMS5003:
+
+-   RH
+
+-   number of UFP
+
+-   number of particles below 0.8um
+
+-   number of particles above 0.8um
+
+-   total particle number
+
+-   source of PM
+
+This is done only on peak concentration, with all the data from each experiment.
+Aggregating the results per experiment yield data sets that are too small to be 
+meaningful.
+
+The target is the PNC reported by the sensors.
+
+This is done using different feature selection algorithms:
+- Boruta
+- Ridge 
+- recursive feature selection with  SVM
+
+
+
+
+# Data preparation
+
+```{r}
+
+
+source("variables.r")
+source("utilities.r")
+require(Boruta)
+require(lubridate)
+
+df_sensors <- readRDS(sensors_file) %>%
+  get_sensor_type()
+df_ops <- readRDS(ops_file_transformed)
+df_nanotracer <- readRDS(nanotracer_file)
+
+
+df_sensors_ft <- df_sensors %>%
+  ungroup() %>%
+  group_by(date, variation, source, exp, sensor_type) %>%
+  summarise(across(where(is.numeric), ~ mean(., na.rm = T)))
+
+
+df_nanotracer$date <- round_date(df_nanotracer$date, unit = "10 s")
+df_nanotracer_ft <- df_nanotracer %>%
+  dplyr::select(date, N.1.)
+
+df_ops_ft <- df_ops %>%
+  mutate(
+    lw08um = Bin.1 + Bin.2 + Bin.3 + Bin.4 + Bin.5 + Bin.6 * (0.8 - 0.721) /
+      (0.897 - 0.721),
+    gr08um = Bin.6 * (0.897 - 0.8) / (0.897 - 0.721) + Bin.7 + Bin.8 + Bin.9 + Bin.10 + Bin.11 + Bin.12 + Bin.13 + Bin.14 + Bin.15 + Bin.16 + Bin.17,
+    total_particle_number = Bin.1 + Bin.2 + Bin.3 + Bin.4 + Bin.5 + Bin.6 + Bin.7 + Bin.8 + Bin.9 + Bin.10 + Bin.11 + Bin.12 + Bin.13 + Bin.14 + Bin.15 + Bin.16 + Bin.17
+  ) %>%
+  dplyr::select(-variation,-exp,-source)
+
+
+df_joined <- df_sensors_ft %>%
+  ungroup() %>%
+  inner_join(df_ops_ft, by = c("date")) %>%
+  inner_join(df_nanotracer_ft, by = c("date"))
+
+head(df_joined)
+
+df_joined_ft <- df_joined %>%
+  #dplyr::filter(exp != "") %>%
+  dplyr::filter(variation == "Peaks") %>%
+  mutate(rh = ifelse(grepl("54%", exp), 54,
+                     ifelse(
+                       grepl("69%", exp), 69,
+                       ifelse(grepl("72%", exp), 72,
+                              ifelse(grepl("76%", exp), 76, 79))
+                     )),
+         source = ifelse(source == "Incense", 1, 0))
+
+
+df_joined_ft <- df_joined_ft %>%
+  rename(
+    Bin.1_0.3um = Bin.1,
+    Bin.2_0.374um = Bin.2,
+    Bin.3_0.465um = Bin.3,
+    Bin.4_0.579um = Bin.4,
+    Bin.5_0.721um = Bin.5,
+    Bin.6_0.897um = Bin.6,
+    Bin.7_1.117um = Bin.7,
+    Bin.8_1.391um = Bin.8,
+    Bin.9_1.732um = Bin.9,
+    Bin.10_2.156um = Bin.10,
+    Bin.11_2.685um = Bin.11,
+    Bin.12_3.343um = Bin.12,
+    Bin.13_4.162um = Bin.13,
+    Bin.14_5.182um = Bin.14,
+    Bin.15_6.451um = Bin.15,
+    Bin.16_8.031um = Bin.16,
+    Bin.17_10um = Bin.17
+  )
+
+
+
+frmla <-
+  gr03um  ~  source + lw08um + N.1. + total_particle_number + rh
+
+
+#frmla <- bias ~  source + lw08um + N.1. + total_particle_number + rh
+#frmla_inter <- bias ~  (source + lw08um + N.1. + total_particle_number + rh )^2
+
+require(caret)
+trControl <- trainControl(
+  method = "repeatedcv",
+  number = 10,
+  search = "grid",
+  repeats = 10
+)
+
+require(doParallel)
+no_cores <- parallel::detectCores() - 1
+cluster <- makePSOCKcluster(no_cores)
+registerDoParallel(cluster)
+
+
+
+```
+
+
+
+# Feature selection
+
+
+
+## Boruta {.tabset}
+
+
+
+### PMS5003 {.tabset}
+
+#### gr03um {.tabset}
+
+```{r}
+
+
+
+
+frmla <- gr03um  ~  source + lw08um + N.1. + total_particle_number + rh
+
+boruta_output <-
+  Boruta(
+    frmla,
+    data = dplyr::filter(df_joined_ft, sensor_type == "PMS5003"),
+    doTrace = 0
+  )
+
+boruta_output
+
+roughFixMod <- TentativeRoughFix(boruta_output)
+boruta_signif <- getSelectedAttributes(roughFixMod)
+print(boruta_signif)
+
+imps <- attStats(roughFixMod)
+imps2 = imps[imps$decision != 'Rejected', c('meanImp', 'decision')]
+head(imps2[order(-imps2$meanImp),])
+
+plot(
+  boruta_output,
+  cex.axis = .7,
+  las = 2,
+  xlab = "",
+  main = "Variable Importance - gr03um"
+)  
+```
+
+
+#### gr05um {.tabset}
+
+```{r}
+
+frmla <- gr05um  ~  source + lw08um + N.1. + total_particle_number + rh
+
+boruta_output <-
+  Boruta(
+    frmla,
+    data = dplyr::filter(df_joined_ft, sensor_type == "PMS5003"),
+    doTrace = 0
+  )
+
+boruta_output
+
+roughFixMod <- TentativeRoughFix(boruta_output)
+boruta_signif <- getSelectedAttributes(roughFixMod)
+print(boruta_signif)
+
+imps <- attStats(roughFixMod)
+imps2 = imps[imps$decision != 'Rejected', c('meanImp', 'decision')]
+head(imps2[order(-imps2$meanImp),])
+
+plot(
+  boruta_output,
+  cex.axis = .7,
+  las = 2,
+  xlab = "",
+  main = "Variable Importance -  gr05um"
+)  
+```
+
+
+#### gr10um {.tabset}
+
+```{r}
+
+
+
+frmla <- gr10um  ~  source + lw08um + N.1. + total_particle_number + rh
+
+boruta_output <-
+  Boruta(
+    frmla,
+    data = dplyr::filter(df_joined_ft, sensor_type == "PMS5003"),
+    doTrace = 0
+  )
+
+boruta_output
+
+roughFixMod <- TentativeRoughFix(boruta_output)
+boruta_signif <- getSelectedAttributes(roughFixMod)
+print(boruta_signif)
+
+imps <- attStats(roughFixMod)
+imps2 = imps[imps$decision != 'Rejected', c('meanImp', 'decision')]
+head(imps2[order(-imps2$meanImp),])
+
+plot(
+  boruta_output,
+  cex.axis = .7,
+  las = 2,
+  xlab = "",
+  main = "Variable Importance - gr10um"
+)  
+```
+
+#### gr25um {.tabset}
+
+```{r}
+
+
+
+
+frmla <- gr25um  ~  source + lw08um + N.1. + total_particle_number + rh
+
+boruta_output <-
+  Boruta(
+    frmla,
+    data = dplyr::filter(df_joined_ft, sensor_type == "PMS5003"),
+    doTrace = 0
+  )
+
+boruta_output
+
+roughFixMod <- TentativeRoughFix(boruta_output)
+boruta_signif <- getSelectedAttributes(roughFixMod)
+print(boruta_signif)
+
+imps <- attStats(roughFixMod)
+imps2 = imps[imps$decision != 'Rejected', c('meanImp', 'decision')]
+head(imps2[order(-imps2$meanImp),])
+
+plot(
+  boruta_output,
+  cex.axis = .7,
+  las = 2,
+  xlab = "",
+  main = "Variable Importance - gr25um"
+)  
+```
+
+
+
+### SPS30 {.tabset}
+
+#### n05 {.tabset}
+
+```{r}
+
+
+
+frmla <- n05  ~  source + lw08um + N.1. + total_particle_number + rh
+
+boruta_output <-
+  Boruta(
+    frmla,
+    data = dplyr::filter(df_joined_ft, sensor_type == "SPS030"),
+    doTrace = 0
+  )
+
+boruta_output
+
+roughFixMod <- TentativeRoughFix(boruta_output)
+boruta_signif <- getSelectedAttributes(roughFixMod)
+print(boruta_signif)
+
+imps <- attStats(roughFixMod)
+imps2 = imps[imps$decision != 'Rejected', c('meanImp', 'decision')]
+head(imps2[order(-imps2$meanImp),])
+
+plot(
+  boruta_output,
+  cex.axis = .7,
+  las = 2,
+  xlab = "",
+  main = "Variable Importance - n05"
+)  
+```
+
+#### n1 {.tabset}
+
+```{r}
+
+
+
+frmla <- n1  ~  source + lw08um + N.1. + total_particle_number + rh
+
+boruta_output <-
+  Boruta(
+    frmla,
+    data = dplyr::filter(df_joined_ft, sensor_type == "SPS030"),
+    doTrace = 0
+  )
+
+boruta_output
+
+roughFixMod <- TentativeRoughFix(boruta_output)
+boruta_signif <- getSelectedAttributes(roughFixMod)
+print(boruta_signif)
+
+imps <- attStats(roughFixMod)
+imps2 = imps[imps$decision != 'Rejected', c('meanImp', 'decision')]
+head(imps2[order(-imps2$meanImp),])
+
+plot(
+  boruta_output,
+  cex.axis = .7,
+  las = 2,
+  xlab = "",
+  main = "Variable Importance - n1"
+)  
+```
+
+
+#### n25 {.tabset}
+
+```{r}
+
+
+frmla <- n25  ~  source + lw08um + N.1. + total_particle_number + rh
+
+boruta_output <-
+  Boruta(
+    frmla,
+    data = dplyr::filter(df_joined_ft, sensor_type == "SPS030"),
+    doTrace = 0
+  )
+
+boruta_output
+
+roughFixMod <- TentativeRoughFix(boruta_output)
+boruta_signif <- getSelectedAttributes(roughFixMod)
+print(boruta_signif)
+
+imps <- attStats(roughFixMod)
+imps2 = imps[imps$decision != 'Rejected', c('meanImp', 'decision')]
+head(imps2[order(-imps2$meanImp),])
+
+plot(
+  boruta_output,
+  cex.axis = .7,
+  las = 2,
+  xlab = "",
+  main = "Variable Importance - n25"
+)  
+```
+
+
+### OPCR1 {.tabset}
+
+#### Bin0 - 0.35/0.7um 
+
+```{r}
+
+
+
+frmla <-
+  Bin0  ~  source + lw08um + N.1. + total_particle_number + rh
+
+boruta_output <-
+  Boruta(
+    frmla,
+    data = dplyr::filter(df_joined_ft, sensor_type == "OPCR1"),
+    doTrace = 0
+  )
+
+boruta_output
+
+roughFixMod <- TentativeRoughFix(boruta_output)
+boruta_signif <- getSelectedAttributes(roughFixMod)
+print(boruta_signif)
+
+imps <- attStats(roughFixMod)
+imps2 = imps[imps$decision != 'Rejected', c('meanImp', 'decision')]
+head(imps2[order(-imps2$meanImp),])
+
+plot(
+  boruta_output,
+  cex.axis = .7,
+  las = 2,
+  xlab = "",
+  main = "Variable Importance -  bin0"
+)  
+```
+
+#### Bin1 - 0.7/1.1um {.tabset}
+
+```{r}
+
+
+
+frmla <-
+  Bin1  ~  source + lw08um + N.1. + total_particle_number + rh
+
+boruta_output <-
+  Boruta(
+    frmla,
+    data = dplyr::filter(df_joined_ft, sensor_type == "OPCR1"),
+    doTrace = 0
+  )
+
+boruta_output
+
+roughFixMod <- TentativeRoughFix(boruta_output)
+boruta_signif <- getSelectedAttributes(roughFixMod)
+print(boruta_signif)
+
+imps <- attStats(roughFixMod)
+imps2 = imps[imps$decision != 'Rejected', c('meanImp', 'decision')]
+head(imps2[order(-imps2$meanImp),])
+
+plot(
+  boruta_output,
+  cex.axis = .7,
+  las = 2,
+  xlab = "",
+  main = "Variable Importance -  bin1"
+)  
+```
+
+#### Bin2 - 1.1/1.5um {.tabset}
+
+```{r}
+
+
+
+frmla <-
+  Bin2  ~  source + lw08um + N.1. + total_particle_number + rh
+
+boruta_output <-
+  Boruta(
+    frmla,
+    data = dplyr::filter(df_joined_ft, sensor_type == "OPCR1"),
+    doTrace = 0
+  )
+
+boruta_output
+
+roughFixMod <- TentativeRoughFix(boruta_output)
+boruta_signif <- getSelectedAttributes(roughFixMod)
+print(boruta_signif)
+
+imps <- attStats(roughFixMod)
+imps2 = imps[imps$decision != 'Rejected', c('meanImp', 'decision')]
+head(imps2[order(-imps2$meanImp),])
+
+plot(
+  boruta_output,
+  cex.axis = .7,
+  las = 2,
+  xlab = "",
+  main = "Variable Importance -  bin2"
+)  
+```
+
+#### Bin3 - 1.5/1.9um {.tabset}
+
+```{r}
+
+
+
+frmla <-
+  Bin3  ~  source + lw08um + N.1. + total_particle_number + rh
+
+boruta_output <-
+  Boruta(
+    frmla,
+    data = dplyr::filter(df_joined_ft, sensor_type == "OPCR1"),
+    doTrace = 0
+  )
+
+boruta_output
+
+roughFixMod <- TentativeRoughFix(boruta_output)
+boruta_signif <- getSelectedAttributes(roughFixMod)
+print(boruta_signif)
+
+imps <- attStats(roughFixMod)
+imps2 = imps[imps$decision != 'Rejected', c('meanImp', 'decision')]
+head(imps2[order(-imps2$meanImp),])
+
+plot(
+  boruta_output,
+  cex.axis = .7,
+  las = 2,
+  xlab = "",
+  main = "Variable Importance -  bin3"
+)  
+```
+
+#### Bin4 - 1.9/2.4um {.tabset}
+
+```{r}
+
+
+
+frmla <-
+  Bin4  ~  source + lw08um + N.1. + total_particle_number + rh
+
+boruta_output <-
+  Boruta(
+    frmla,
+    data = dplyr::filter(df_joined_ft, sensor_type == "OPCR1"),
+    doTrace = 0
+  )
+
+boruta_output
+
+roughFixMod <- TentativeRoughFix(boruta_output)
+boruta_signif <- getSelectedAttributes(roughFixMod)
+print(boruta_signif)
+
+imps <- attStats(roughFixMod)
+imps2 = imps[imps$decision != 'Rejected', c('meanImp', 'decision')]
+head(imps2[order(-imps2$meanImp),])
+
+plot(
+  boruta_output,
+  cex.axis = .7,
+  las = 2,
+  xlab = "",
+  main = "Variable Importance -  bin4"
+)  
+```
+
+
+
+
+
+
+## Recursive feature elimination - SVM {.tabset}
+
+
+### PMS5003 {.tabset}
+
+#### gr03um {.tabset}
+
+```{r}
+
+
+
+frmla <-
+  gr03um  ~  source + lw08um + N.1. + total_particle_number + rh
+
+
+subsets <- c(1:6)
+x <- df_joined_ft %>%
+  dplyr::filter(sensor_type == "PMS5003") %>%
+  dplyr::select(source, lw08um, total_particle_number, rh, N.1., gr03um)
+
+
+svmProfile <- rfe(
+  gr03um ~ .,
+  data = x,
+  sizes = c(1:6),
+  rfeControl = rfeControl(
+    functions = caretFuncs,
+    number = 10,
+    method = "repeatedcv"
+  ),
+  ## pass options to train()
+  method = "svmRadial"
+)
+
+
+
+svmProfile
+
+
+predictors(svmProfile)
+
+varImp(svmProfile)
+
+
+data.frame(Overall = svmProfile$variables$Overall,
+           var = svmProfile$variables$var) %>%
+  group_by(var) %>%
+  summarise(mean(Overall, na.rm = T))
+
+```
+
+
+
+#### gr05um {.tabset}
+
+```{r}
+
+
+
+
+frmla <-
+  gr05um  ~  source + lw08um + N.1. + total_particle_number + rh
+
+x <- df_joined_ft %>%
+  dplyr::filter(sensor_type == "PMS5003") %>%
+  dplyr::select(source, lw08um, total_particle_number, rh, N.1., gr05um)
+
+svmProfile <- rfe(
+  gr05um ~ .,
+  data = x,
+  sizes = c(1:6),
+  rfeControl = rfeControl(
+    functions = caretFuncs,
+    number = 10,
+    method = "repeatedcv"
+  ),
+  ## pass options to train()
+  method = "svmRadial"
+)
+
+
+
+svmProfile
+
+
+predictors(svmProfile)
+
+varImp(svmProfile)
+
+
+data.frame(Overall = svmProfile$variables$Overall,
+           var = svmProfile$variables$var) %>%
+  group_by(var) %>%
+  summarise(mean(Overall, na.rm = T))
+```
+
+
+#### gr10um {.tabset}
+
+```{r}
+
+
+frmla <- gr10um  ~  source + lw08um + N.1. + total_particle_number + rh 
+
+x <- df_joined_ft %>%
+  dplyr::filter(sensor_type == "PMS5003") %>%
+  dplyr::select(source, lw08um, total_particle_number, rh, N.1.,gr10um)
+
+svmProfile <- rfe(gr10um~., data = x,
+                  sizes = c(1:6),
+                  rfeControl = rfeControl(functions = caretFuncs,
+                                          number = 10,
+                                          method = "repeatedcv"),
+                  ## pass options to train()
+                  method = "svmRadial")
+
+
+
+svmProfile
+
+
+predictors(svmProfile)
+
+varImp(svmProfile)
+
+
+data.frame(Overall = svmProfile$variables$Overall, var = svmProfile$variables$var) %>%
+  group_by(var) %>%
+  summarise(mean(Overall, na.rm=T))
+
+```
+
+#### gr25um {.tabset}
+
+```{r}
+
+
+
+frmla <- gr25um  ~  source + lw08um + N.1. + total_particle_number + rh 
+
+x <- df_joined_ft %>%
+  dplyr::filter(sensor_type == "PMS5003") %>%
+  dplyr::select(source, lw08um, total_particle_number, rh, N.1.,gr25um)
+
+svmProfile <- rfe(gr25um~., data = x,
+                  sizes = c(1:6),
+                  rfeControl = rfeControl(functions = caretFuncs,
+                                          number = 10,
+                                          method = "repeatedcv"),
+                  ## pass options to train()
+                  method = "svmRadial")
+
+
+
+svmProfile
+
+
+predictors(svmProfile)
+
+varImp(svmProfile)
+
+
+data.frame(Overall = svmProfile$variables$Overall, var = svmProfile$variables$var) %>%
+  group_by(var) %>%
+  summarise(mean(Overall, na.rm=T))
+```
+
+
+
+### SPS30 {.tabset}
+
+#### n05 {.tabset}
+
+```{r}
+
+
+frmla <- n05  ~  source + lw08um + N.1. + total_particle_number + rh 
+
+subsets <- c(1:6)
+x <- df_joined_ft %>%
+  dplyr::filter(sensor_type == "SPS030") %>%
+  dplyr::select(source, lw08um, total_particle_number, rh, N.1., n05)
+
+svmProfile <- rfe(n05~., data = x,
+                  sizes = c(1:6),
+                  rfeControl = rfeControl(functions = caretFuncs,
+                                          number = 10,
+                                          method = "repeatedcv"),
+                  ## pass options to train()
+                  method = "svmRadial")
+
+
+
+svmProfile
+
+
+predictors(svmProfile)
+
+varImp(svmProfile)
+
+
+data.frame(Overall = svmProfile$variables$Overall, var = svmProfile$variables$var) %>%
+  group_by(var) %>%
+  summarise(mean(Overall, na.rm=T))
+
+```
+
+#### n1 {.tabset}
+
+```{r}
+
+
+frmla <- n1  ~  source + lw08um + N.1. + total_particle_number + rh 
+x <- df_joined_ft %>%
+  dplyr::filter(sensor_type == "SPS030") %>%
+  dplyr::select(source, lw08um, total_particle_number, rh, N.1., n1)
+
+svmProfile <- rfe(n1~., data = x,
+                  sizes = c(1:6),
+                  rfeControl = rfeControl(functions = caretFuncs,
+                                          number = 10,
+                                          method = "repeatedcv"),
+                  ## pass options to train()
+                  method = "svmRadial")
+
+
+
+svmProfile
+
+
+predictors(svmProfile)
+
+varImp(svmProfile)
+
+
+data.frame(Overall = svmProfile$variables$Overall, var = svmProfile$variables$var) %>%
+  group_by(var) %>%
+  summarise(mean(Overall, na.rm=T))
+```
+
+
+#### n25 {.tabset}
+
+```{r}
+
+
+frmla <- n25  ~  source + lw08um + N.1. + total_particle_number + rh 
+
+x <- df_joined_ft %>%
+  dplyr::filter(sensor_type == "SPS030") %>%
+  dplyr::select(source, lw08um, total_particle_number, rh, N.1., n25)
+
+svmProfile <- rfe(n25~., data = x,
+                  sizes = c(1:6),
+                  rfeControl = rfeControl(functions = caretFuncs,
+                                          number = 10,
+                                          method = "repeatedcv"),
+                  ## pass options to train()
+                  method = "svmRadial")
+
+
+
+svmProfile
+
+
+predictors(svmProfile)
+
+varImp(svmProfile)
+
+
+data.frame(Overall = svmProfile$variables$Overall, var = svmProfile$variables$var) %>%
+  group_by(var) %>%
+  summarise(mean(Overall, na.rm=T))
+
+```
+
+
+### OPCR1 {.tabset}
+
+#### Bin0 - 0.35/0.7um 
+
+```{r}
+
+
+frmla <- Bin0  ~  source + lw08um + N.1. + total_particle_number + rh 
+
+
+
+subsets <- c(1:6)
+x <- df_joined_ft %>%
+  dplyr::filter(sensor_type == "OPCR1") %>%
+  dplyr::select(source, lw08um, total_particle_number, rh, N.1., Bin0)
+
+svmProfile <- rfe(Bin0~., data = x,
+                  sizes = c(1:6),
+                  rfeControl = rfeControl(functions = caretFuncs,
+                                          number = 10,
+                                          method = "repeatedcv"),
+                  ## pass options to train()
+                  method = "svmRadial")
+
+
+
+svmProfile
+
+
+predictors(svmProfile)
+
+varImp(svmProfile)
+
+
+data.frame(Overall = svmProfile$variables$Overall, var = svmProfile$variables$var) %>%
+  group_by(var) %>%
+  summarise(mean(Overall, na.rm=T))
+
+```
+
+#### Bin1 - 0.7/1.1um {.tabset}
+
+```{r}
+
+
+frmla <- Bin1  ~  source + lw08um + N.1. + total_particle_number + rh 
+
+
+x <- df_joined_ft %>%
+  dplyr::filter(sensor_type == "OPCR1") %>%
+  dplyr::select(source, lw08um, total_particle_number, rh, N.1., Bin1)
+
+svmProfile <- rfe(Bin1~., data = x,
+                  sizes = c(1:6),
+                  rfeControl = rfeControl(functions = caretFuncs,
+                                          number = 10,
+                                          method = "repeatedcv"),
+                  ## pass options to train()
+                  method = "svmRadial")
+
+
+
+svmProfile
+
+
+predictors(svmProfile)
+
+varImp(svmProfile)
+
+
+data.frame(Overall = svmProfile$variables$Overall, var = svmProfile$variables$var) %>%
+  group_by(var) %>%
+  summarise(mean(Overall, na.rm=T))
+
+```
+
+#### Bin2 - 1.1/1.5um {.tabset}
+
+```{r}
+
+
+frmla <- Bin2  ~  source + lw08um + N.1. + total_particle_number + rh 
+
+x <- df_joined_ft %>%
+  dplyr::filter(sensor_type == "OPCR1") %>%
+  dplyr::select(source, lw08um, total_particle_number, rh, N.1., Bin2)
+
+svmProfile <- rfe(Bin2~., data = x,
+                  sizes = c(1:6),
+                  rfeControl = rfeControl(functions = caretFuncs,
+                                          number = 10,
+                                          method = "repeatedcv"),
+                  ## pass options to train()
+                  method = "svmRadial")
+
+
+
+svmProfile
+
+
+predictors(svmProfile)
+
+varImp(svmProfile)
+
+
+data.frame(Overall = svmProfile$variables$Overall, var = svmProfile$variables$var) %>%
+  group_by(var) %>%
+  summarise(mean(Overall, na.rm=T))
+
+```
+
+#### Bin3 - 1.5/1.9um {.tabset}
+
+```{r}
+
+
+frmla <- Bin3  ~  source + lw08um + N.1. + total_particle_number + rh 
+
+x <- df_joined_ft %>%
+  dplyr::filter(sensor_type == "OPCR1") %>%
+  dplyr::select(source, lw08um, total_particle_number, rh, N.1., Bin3)
+
+svmProfile <- rfe(Bin3~., data = x,
+                  sizes = c(1:6),
+                  rfeControl = rfeControl(functions = caretFuncs,
+                                          number = 10,
+                                          method = "repeatedcv"),
+                  ## pass options to train()
+                  method = "svmRadial")
+
+
+
+svmProfile
+
+
+predictors(svmProfile)
+
+varImp(svmProfile)
+
+
+data.frame(Overall = svmProfile$variables$Overall, var = svmProfile$variables$var) %>%
+  group_by(var) %>%
+  summarise(mean(Overall, na.rm=T))
+```
+
+#### Bin4 - 1.9/2.4um {.tabset}
+
+```{r}
+
+
+frmla <- Bin4  ~  source + lw08um + N.1. + total_particle_number + rh 
+
+x <- df_joined_ft %>%
+  dplyr::filter(sensor_type == "OPCR1") %>%
+  dplyr::select(source, lw08um, total_particle_number, rh, N.1., Bin4)
+
+svmProfile <- rfe(Bin4~., data = x,
+                  sizes = c(1:6),
+                  rfeControl = rfeControl(functions = caretFuncs,
+                                          number = 10,
+                                          method = "repeatedcv"),
+                  ## pass options to train()
+                  method = "svmRadial")
+
+
+
+svmProfile
+
+
+predictors(svmProfile)
+
+varImp(svmProfile)
+
+
+data.frame(Overall = svmProfile$variables$Overall, var = svmProfile$variables$var) %>%
+  group_by(var) %>%
+  summarise(mean(Overall, na.rm=T))
+
+```
+
+
+
+
+
+
+
+
+
+## Ridge {.tabset}
+
+
+### PMS5003 {.tabset}
+
+#### gr03um {.tabset}
+
+```{r}
+
+
+frmla <- gr03um  ~  source + lw08um + N.1. + total_particle_number + rh 
+
+trControl <- trainControl(method = "repeatedcv",
+    number = 10,
+    search = "grid",
+    repeats = 10)
+
+tuneGrid <- expand.grid(alpha = 0,
+                        lambda = seq(0.0001, 1, length = 100))
+
+
+glmnet.fit <- train(frmla, data = df_joined_ft[df_joined_ft$sensor_type == "PMS5003", ], 
+                method = "glmnet", metric = "RMSE",
+                preProcess = c("center", "scale"),
+                trControl = trControl,
+                tuneGrid = tuneGrid)
+
+glmnet.fit$bestTune
+varImp(glmnet.fit)
+```
+
+
+#### gr05um {.tabset}
+
+```{r}
+
+
+
+frmla <- gr05um  ~  source + lw08um + N.1. + total_particle_number + rh 
+
+glmnet.fit <- train(frmla, data = df_joined_ft[df_joined_ft$sensor_type == "PMS5003", ], 
+                method = "glmnet", metric = "RMSE",
+                preProcess = c("center", "scale"),
+                trControl = trControl,
+                tuneGrid = tuneGrid)
+
+glmnet.fit$bestTune
+varImp(glmnet.fit)
+```
+
+
+#### gr10um {.tabset}
+
+```{r}
+
+
+frmla <- gr10um  ~  source + lw08um + N.1. + total_particle_number + rh 
+
+glmnet.fit <- train(frmla, data = df_joined_ft[df_joined_ft$sensor_type == "PMS5003", ], 
+                method = "glmnet", metric = "RMSE",
+                preProcess = c("center", "scale"),
+                trControl = trControl,
+                tuneGrid = tuneGrid)
+
+glmnet.fit$bestTune
+varImp(glmnet.fit)
+```
+
+#### gr25um {.tabset}
+
+```{r}
+
+
+
+frmla <- gr25um  ~  source + lw08um + N.1. + total_particle_number + rh 
+
+glmnet.fit <- train(frmla, data = df_joined_ft[df_joined_ft$sensor_type == "PMS5003", ], 
+                method = "glmnet", metric = "RMSE",
+                preProcess = c("center", "scale"),
+                trControl = trControl,
+                tuneGrid = tuneGrid)
+
+glmnet.fit$bestTune
+varImp(glmnet.fit)
+```
+
+
+
+### SPS30 {.tabset}
+
+#### n05 {.tabset}
+
+```{r}
+
+
+frmla <- n05  ~  source + lw08um + N.1. + total_particle_number + rh 
+
+glmnet.fit <- train(frmla, data = df_joined_ft[df_joined_ft$sensor_type == "SPS030", ], 
+                method = "glmnet", metric = "RMSE",
+                preProcess = c("center", "scale"),
+                trControl = trControl,
+                tuneGrid = tuneGrid)
+
+glmnet.fit$bestTune
+varImp(glmnet.fit)
+```
+
+#### n1 {.tabset}
+
+```{r}
+
+
+frmla <- n1  ~  source + lw08um + N.1. + total_particle_number + rh 
+
+glmnet.fit <- train(frmla, data = df_joined_ft[df_joined_ft$sensor_type == "SPS030", ], 
+                method = "glmnet", metric = "RMSE",
+                preProcess = c("center", "scale"),
+                trControl = trControl,
+                tuneGrid = tuneGrid)
+
+glmnet.fit$bestTune
+varImp(glmnet.fit)
+```
+
+
+#### n25 {.tabset}
+
+```{r}
+
+
+frmla <- n25  ~  source + lw08um + N.1. + total_particle_number + rh 
+
+glmnet.fit <- train(frmla, data = df_joined_ft[df_joined_ft$sensor_type == "SPS030", ], 
+                method = "glmnet", metric = "RMSE",
+                preProcess = c("center", "scale"),
+                trControl = trControl,
+                tuneGrid = tuneGrid)
+
+glmnet.fit$bestTune
+varImp(glmnet.fit)
+```
+
+
+### OPCR1 {.tabset}
+
+#### Bin0 - 0.35/0.7um 
+
+```{r}
+
+
+frmla <- Bin0  ~  source + lw08um + N.1. + total_particle_number + rh 
+
+glmnet.fit <- train(frmla, data = df_joined_ft[df_joined_ft$sensor_type == "OPCR1", ], 
+                method = "glmnet", metric = "RMSE",
+                preProcess = c("center", "scale"),
+                trControl = trControl,
+                tuneGrid = tuneGrid)
+
+glmnet.fit$bestTune
+varImp(glmnet.fit)
+```
+
+#### Bin1 - 0.7/1.1um {.tabset}
+
+```{r}
+
+
+frmla <- Bin1  ~  source + lw08um + N.1. + total_particle_number + rh 
+
+
+glmnet.fit <- train(frmla, data = df_joined_ft[df_joined_ft$sensor_type == "OPCR1", ], 
+                method = "glmnet", metric = "RMSE",
+                preProcess = c("center", "scale"),
+                trControl = trControl,
+                tuneGrid = tuneGrid)
+
+glmnet.fit$bestTune
+varImp(glmnet.fit)
+```
+
+#### Bin2 - 1.1/1.5um {.tabset}
+
+```{r}
+
+
+frmla <- Bin2  ~  source + lw08um + N.1. + total_particle_number + rh 
+
+
+glmnet.fit <- train(frmla, data = df_joined_ft[df_joined_ft$sensor_type == "OPCR1", ], 
+                method = "glmnet", metric = "RMSE",
+                preProcess = c("center", "scale"),
+                trControl = trControl,
+                tuneGrid = tuneGrid)
+
+glmnet.fit$bestTune
+varImp(glmnet.fit)
+```
+
+#### Bin3 - 1.5/1.9um {.tabset}
+
+```{r}
+
+
+frmla <- Bin3  ~  source + lw08um + N.1. + total_particle_number + rh 
+
+
+glmnet.fit <- train(frmla, data = df_joined_ft[df_joined_ft$sensor_type == "OPCR1", ], 
+                method = "glmnet", metric = "RMSE",
+                preProcess = c("center", "scale"),
+                trControl = trControl,
+                tuneGrid = tuneGrid)
+
+glmnet.fit$bestTune
+varImp(glmnet.fit)
+```
+
+#### Bin4 - 1.9/2.4um {.tabset}
+
+```{r}
+
+
+frmla <- Bin4  ~  source + lw08um + N.1. + total_particle_number + rh 
+
+
+glmnet.fit <- train(frmla, data = df_joined_ft[df_joined_ft$sensor_type == "OPCR1", ], 
+                method = "glmnet", metric = "RMSE",
+                preProcess = c("center", "scale"),
+                trControl = trControl,
+                tuneGrid = tuneGrid)
+
+glmnet.fit$bestTune
+varImp(glmnet.fit)
+```

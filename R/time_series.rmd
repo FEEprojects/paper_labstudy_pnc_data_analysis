@@ -18,7 +18,6 @@ knit: (function(inputFile, encoding) {
 editor_options: 
   markdown: 
     wrap: 80
-bibliography: references.bib
 ---
 
 This notebook plots the time-series of the different experiment presented in the 
@@ -43,7 +42,7 @@ require(ggplot2)
 require(RColorBrewer)
 require(plotly)
 df_ops <- readRDS(ops_file_transformed)
-df_sensors <- readRDS(sensor_file)
+df_sensors <- readRDS(sensors_file)
 
 
 df_ops$reference <- "OPS"
@@ -1041,7 +1040,7 @@ ggsave(
   height = 180
 )
 
-pl_legend
+
 ```
 
 

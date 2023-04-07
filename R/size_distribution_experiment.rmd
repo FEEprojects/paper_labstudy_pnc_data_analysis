@@ -1,0 +1,725 @@
+---
+title: "Size distribution per experiment"
+author: "FMJ Bulot (florentin.bulot@centraliens.net)"
+date: "Last generated: `r format(Sys.time(), '%d %B, %Y, %H:%M')`"
+output:
+  html_document:
+    df_print: paged
+    code_folding: hide
+    toc: true
+    toc_depth: 2
+    toc_float:
+      collapsed: false
+knit: (function(inputFile, encoding) { 
+      out_dir <- '../docs';
+      rmarkdown::render(inputFile,
+                        encoding=encoding, 
+                        output_file=file.path(dirname(inputFile), out_dir, 'size_distribution_experiment.html'))})
+editor_options: 
+  markdown: 
+    wrap: 80
+---
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(fig.width=12, fig.height=8, fig.path='../docs/figs/size_distribution_experiment/',warning=FALSE, message=FALSE)
+```
+
+In this notebook, we explore the evolution of the size distribution measured by
+the three models of sensors. 
+
+
+
+# Load data and utility scripts
+
+
+
+```{r, setup, warning=FALSE}
+
+
+source("utilities.R")
+source("variables.R")
+require(plotly)
+require(scales)
+df_ops <- readRDS(ops_file_transformed)
+df_sensors <- readRDS(sensors_file)
+
+
+df_sensors <- get_sensor_type(df_sensors)
+
+#Initialise
+ops_distrib <- df_ops %>%  filter(exp == "(1) RH=54%") %>%
+  summarise_all("mean") %>%
+  dplyr::select(starts_with("Bin.")) %>%
+  gather(bin_size, particle_number)
+ops_distrib$mean_bin_dimension = 0
+ops_distrib$diff_bin_dimension = 0
+
+#Define the size distribution of Bin.X as the mean between the boundaries of Bin.X and Bin.X+1
+ops_distrib[ops_distrib$bin_size == "Bin.1", ]$mean_bin_dimension = (0.3 +
+                                                                       0.374) / 2
+ops_distrib[ops_distrib$bin_size == "Bin.2", ]$mean_bin_dimension = (0.374 +
+                                                                       0.465) / 2
+ops_distrib[ops_distrib$bin_size == "Bin.3", ]$mean_bin_dimension = (0.465 + 0.579) /
+  2
+ops_distrib[ops_distrib$bin_size == "Bin.4", ]$mean_bin_dimension = (0.579 +
+                                                                       0.721) / 2
+ops_distrib[ops_distrib$bin_size == "Bin.5", ]$mean_bin_dimension = (0.721 +
+                                                                       0.897) / 2
+ops_distrib[ops_distrib$bin_size == "Bin.6", ]$mean_bin_dimension = (0.897 +
+                                                                       1.117) / 2
+ops_distrib[ops_distrib$bin_size == "Bin.7", ]$mean_bin_dimension = (1.117 +
+                                                                       1.391) / 2
+ops_distrib[ops_distrib$bin_size == "Bin.8", ]$mean_bin_dimension = (1.391 +
+                                                                       1.732) / 2
+ops_distrib[ops_distrib$bin_size == "Bin.9", ]$mean_bin_dimension = (1.732 +
+                                                                       2.156) / 2
+ops_distrib[ops_distrib$bin_size == "Bin.10", ]$mean_bin_dimension = (2.156 +
+                                                                        2.685) / 2
+ops_distrib[ops_distrib$bin_size == "Bin.11", ]$mean_bin_dimension = (2.685 +
+                                                                        3.343) / 2
+ops_distrib[ops_distrib$bin_size == "Bin.12", ]$mean_bin_dimension = (3.343 +
+                                                                        4.162) / 2
+ops_distrib[ops_distrib$bin_size == "Bin.13", ]$mean_bin_dimension = (4.162 +
+                                                                        5.182) / 2
+ops_distrib[ops_distrib$bin_size == "Bin.14", ]$mean_bin_dimension = (5.182 +
+                                                                        6.451) / 2
+ops_distrib[ops_distrib$bin_size == "Bin.15", ]$mean_bin_dimension = (6.451 +
+                                                                        8.031) / 2
+ops_distrib[ops_distrib$bin_size == "Bin.16", ]$mean_bin_dimension = (8.031 +
+                                                                        10) / 2
+ops_distrib[ops_distrib$bin_size == "Bin.17", ]$mean_bin_dimension = 10
+
+ops_distrib[ops_distrib$bin_size == "Bin.1", ]$diff_bin_dimension = log10(0.3) -
+  log10(0.374)
+ops_distrib[ops_distrib$bin_size == "Bin.2", ]$diff_bin_dimension = log10(0.374) -
+  log10(0.465)
+ops_distrib[ops_distrib$bin_size == "Bin.3", ]$diff_bin_dimension = log10(0.465) - log10(0.579)
+ops_distrib[ops_distrib$bin_size == "Bin.4", ]$diff_bin_dimension = log10(0.579) -
+  log10(0.721)
+ops_distrib[ops_distrib$bin_size == "Bin.5", ]$diff_bin_dimension = log10(0.721) -
+  log10(0.897)
+ops_distrib[ops_distrib$bin_size == "Bin.6", ]$diff_bin_dimension = log10(0.897) -
+  log10(1.117)
+ops_distrib[ops_distrib$bin_size == "Bin.7", ]$diff_bin_dimension = log10(1.117) -
+  log10(1.391)
+ops_distrib[ops_distrib$bin_size == "Bin.8", ]$diff_bin_dimension = log10(1.391) -
+  log10(1.732)
+ops_distrib[ops_distrib$bin_size == "Bin.9", ]$diff_bin_dimension = log10(1.732) -
+  log10(2.156)
+ops_distrib[ops_distrib$bin_size == "Bin.10", ]$diff_bin_dimension = log10(2.156) -
+  log10(2.685)
+ops_distrib[ops_distrib$bin_size == "Bin.11", ]$diff_bin_dimension = log10(2.685) -
+  log10(3.343)
+ops_distrib[ops_distrib$bin_size == "Bin.12", ]$diff_bin_dimension = log10(3.343) -
+  log10(4.162)
+ops_distrib[ops_distrib$bin_size == "Bin.13", ]$diff_bin_dimension = log10(4.162) -
+  log10(5.182)
+ops_distrib[ops_distrib$bin_size == "Bin.14", ]$diff_bin_dimension = log10(5.182) -
+  log10(6.451)
+ops_distrib[ops_distrib$bin_size == "Bin.15", ]$diff_bin_dimension = log10(6.451) -
+  log10(8.031)
+ops_distrib[ops_distrib$bin_size == "Bin.16", ]$diff_bin_dimension = log10(8.031) -
+  log10(10)
+ops_distrib[ops_distrib$bin_size == "Bin.17", ]$diff_bin_dimension = 10
+
+
+ops <- df_ops %>%
+  group_by(exp, variation, source) %>%
+  summarise_all("mean") %>%
+  dplyr::select(exp, variation, source, starts_with("Bin.")) %>%
+  gather(bin_size, particle_number,-exp, -variation, -source) %>%
+  inner_join(
+    dplyr::select(ops_distrib, diff_bin_dimension, mean_bin_dimension,
+                  bin_size),
+    by = c("bin_size")
+  ) %>%
+  mutate(dN_dlog = particle_number / (-diff_bin_dimension))
+
+
+ops_peaks_candle <- df_ops %>%
+  dplyr::filter(variation == "Peaks", source == "Candle") %>%
+  group_by(exp) %>%
+  summarise_all("mean") %>%
+  dplyr::select(exp, starts_with("Bin.")) %>%
+  gather(bin_size, particle_number,-exp) %>%
+  inner_join(
+    dplyr::select(ops_distrib, diff_bin_dimension, mean_bin_dimension,
+                  bin_size),
+    by = c("bin_size")
+  ) %>%
+  mutate(dN_dlog = particle_number / (-diff_bin_dimension))
+
+
+ops_stable_candle <- df_ops %>%
+  dplyr::filter(variation == "Stable", source == "Candle") %>%
+  group_by(exp) %>%
+  summarise_all("mean") %>%
+  dplyr::select(exp, starts_with("Bin.")) %>%
+  gather(bin_size, particle_number,-exp) %>%
+  inner_join(
+    dplyr::select(ops_distrib, diff_bin_dimension, mean_bin_dimension,
+                  bin_size),
+    by = c("bin_size")
+  ) %>%
+  mutate(dN_dlog = particle_number / (-diff_bin_dimension))
+
+ops_peaks_incense <- df_ops %>%
+  dplyr::filter(variation == "Peaks", source == "Incense") %>%
+  group_by(exp) %>%
+  summarise_all("mean") %>%
+  dplyr::select(exp, starts_with("Bin.")) %>%
+  gather(bin_size, particle_number,-exp) %>%
+  inner_join(
+    dplyr::select(ops_distrib, diff_bin_dimension, mean_bin_dimension,
+                  bin_size),
+    by = c("bin_size")
+  ) %>%
+  mutate(dN_dlog = particle_number / (-diff_bin_dimension))
+
+
+ops_stable_incense <- df_ops %>%
+  dplyr::filter(variation == "Stable", source == "Incense") %>%
+  group_by(exp) %>%
+  summarise_all("mean") %>%
+  dplyr::select(exp, starts_with("Bin.")) %>%
+  gather(bin_size, particle_number,-exp) %>%
+  inner_join(
+    dplyr::select(ops_distrib, diff_bin_dimension, mean_bin_dimension,
+                  bin_size),
+    by = c("bin_size")
+  ) %>%
+  mutate(dN_dlog = particle_number / (-diff_bin_dimension))
+
+
+
+
+
+
+#Initialise
+df_sensors %>%
+  filter(exp == "(1) RH=54%") %>%
+  filter(grepl("PMS", sensor)) %>%
+  ungroup() %>%
+  dplyr::select(matches("gr.*_.*um"), -cut_date, -sensor) %>%
+  summarise_all("mean") %>%
+  gather(bin_size, particle_number) -> pms_distrib
+pms_distrib$mean_bin_dimension = 0
+pms_distrib$diff_bin_dimension = 0
+
+#Define the size distribution of Bin.X as the mean between the boundaries of Bin.X and Bin.X+1
+pms_distrib[pms_distrib$bin_size == "gr03_05um",]$mean_bin_dimension = (0.3 + 0.5) /
+  2
+pms_distrib[pms_distrib$bin_size == "gr05_10um",]$mean_bin_dimension = (0.5 + 1) /
+  2
+pms_distrib[pms_distrib$bin_size == "gr10_25um",]$mean_bin_dimension = (1 + 2.5) /
+  2
+pms_distrib[pms_distrib$bin_size == "gr25_50um",]$mean_bin_dimension = (2.5 + 5) /
+  2
+pms_distrib[pms_distrib$bin_size == "gr50_100um",]$mean_bin_dimension = (5 + 10) /
+  2
+
+pms_distrib[pms_distrib$bin_size == "gr03_05um",]$diff_bin_dimension = log10(0.3) - log10(0.5)
+pms_distrib[pms_distrib$bin_size == "gr05_10um",]$diff_bin_dimension = log10(0.5) - log10(1)
+pms_distrib[pms_distrib$bin_size == "gr10_25um",]$diff_bin_dimension = log10(1) - log10(2.5)
+pms_distrib[pms_distrib$bin_size == "gr25_50um",]$diff_bin_dimension = log10(2.5) - log10(5)
+pms_distrib[pms_distrib$bin_size == "gr50_100um",]$diff_bin_dimension = log10(5) - log10(10)
+
+pms_distrib$sensor_type <- "PMS5003"
+
+#Initialise
+opcr1_distrib <- df_sensors %>%
+  filter(exp == "(1) RH=54%") %>%
+  filter(grepl("OPC", sensor)) %>%
+  ungroup() %>%
+  dplyr::select(starts_with("Bin"),-contains("MToF"),-cut_date,-sensor) %>%
+  summarise_all("mean") %>%
+  gather(bin_size, particle_number)
+opcr1_distrib$mean_bin_dimension = 0
+opcr1_distrib$diff_bin_dimension = 0
+
+
+
+
+
+
+#Define the size distribution of Bin.X as the mean between the boundaries of Bin.X and Bin.X+1 from https://www.alphasense.com/wp-content/uploads/2019/08/OPC-R1.pdf
+opcr1_distrib[opcr1_distrib$bin_size == "Bin0", ]$mean_bin_dimension = (0.35 + 0.7) /
+  2
+opcr1_distrib[opcr1_distrib$bin_size == "Bin1", ]$mean_bin_dimension = (0.7 + 1.1) /
+  2
+opcr1_distrib[opcr1_distrib$bin_size == "Bin2", ]$mean_bin_dimension = (1.1 + 1.5) /
+  2
+opcr1_distrib[opcr1_distrib$bin_size == "Bin3", ]$mean_bin_dimension = (1.5 + 1.9) /
+  2
+opcr1_distrib[opcr1_distrib$bin_size == "Bin4", ]$mean_bin_dimension = (1.9 + 2.4) /
+  2
+opcr1_distrib[opcr1_distrib$bin_size == "Bin5", ]$mean_bin_dimension = (2.4 + 3.0) /
+  2
+opcr1_distrib[opcr1_distrib$bin_size == "Bin6", ]$mean_bin_dimension = (3.0 + 4.0) /
+  2
+opcr1_distrib[opcr1_distrib$bin_size == "Bin7", ]$mean_bin_dimension = (4.0 + 5.0) /
+  2
+opcr1_distrib[opcr1_distrib$bin_size == "Bin8", ]$mean_bin_dimension = (5.0 + 6.0) /
+  2
+opcr1_distrib[opcr1_distrib$bin_size == "Bin9", ]$mean_bin_dimension = (6.0 + 7.0) /
+  2
+opcr1_distrib[opcr1_distrib$bin_size == "Bin10", ]$mean_bin_dimension = (7.0 + 8.0) /
+  2
+opcr1_distrib[opcr1_distrib$bin_size == "Bin11", ]$mean_bin_dimension = (8.0 + 9.0) /
+  2
+opcr1_distrib[opcr1_distrib$bin_size == "Bin12", ]$mean_bin_dimension = (9.0 + 10.0) /
+  2
+opcr1_distrib[opcr1_distrib$bin_size == "Bin13", ]$mean_bin_dimension = (10.0 + 11.0) /
+  2
+opcr1_distrib[opcr1_distrib$bin_size == "Bin14", ]$mean_bin_dimension = (11.0 + 12.0) /
+  2
+opcr1_distrib[opcr1_distrib$bin_size == "Bin15", ]$mean_bin_dimension = (12.0 + 12.4) /
+  2
+
+
+opcr1_distrib[opcr1_distrib$bin_size == "Bin0", ]$diff_bin_dimension = log10(0.35) - log10(0.7)
+opcr1_distrib[opcr1_distrib$bin_size == "Bin1", ]$diff_bin_dimension = log10(0.7) - log10(1.1)
+opcr1_distrib[opcr1_distrib$bin_size == "Bin2", ]$diff_bin_dimension = log10(1.1) - log10(1.5)
+opcr1_distrib[opcr1_distrib$bin_size == "Bin3", ]$diff_bin_dimension = log10(1.5) - log10(1.9)
+opcr1_distrib[opcr1_distrib$bin_size == "Bin4", ]$diff_bin_dimension = log10(1.9) - log10(2.4)
+opcr1_distrib[opcr1_distrib$bin_size == "Bin5", ]$diff_bin_dimension = log10(2.4) - log10(3.0)
+opcr1_distrib[opcr1_distrib$bin_size == "Bin6", ]$diff_bin_dimension = log10(3.0) - log10(4.0)
+opcr1_distrib[opcr1_distrib$bin_size == "Bin7", ]$diff_bin_dimension = log10(4.0) - log10(5.0)
+opcr1_distrib[opcr1_distrib$bin_size == "Bin8", ]$diff_bin_dimension = log10(5.0) - log10(6.0)
+opcr1_distrib[opcr1_distrib$bin_size == "Bin9", ]$diff_bin_dimension = log10(6.0) - log10(7.0)
+opcr1_distrib[opcr1_distrib$bin_size == "Bin10", ]$diff_bin_dimension = log10(7.0) - log10(8.0)
+opcr1_distrib[opcr1_distrib$bin_size == "Bin11", ]$diff_bin_dimension = log10(8.0) - log10(9.0)
+opcr1_distrib[opcr1_distrib$bin_size == "Bin12", ]$diff_bin_dimension = log10(9.0) - log10(10.0)
+opcr1_distrib[opcr1_distrib$bin_size == "Bin13", ]$diff_bin_dimension = log10(10.0) - log10(11.0)
+opcr1_distrib[opcr1_distrib$bin_size == "Bin14", ]$diff_bin_dimension = log10(11.0) - log10(12.0)
+opcr1_distrib[opcr1_distrib$bin_size == "Bin15", ]$diff_bin_dimension = log10(12.0) - log10(12.4)
+
+opcr1_distrib$sensor_type <- "OPCR1"
+
+
+
+#Initialise
+sps_distrib <- df_sensors %>%
+  filter(exp == "(1) RH=54%") %>%
+  filter(grepl("SPS", sensor)) %>%
+  ungroup() %>%
+  dplyr::select(n05, matches("^n[0-9]+_[0-9]+"),-cut_date,-sensor) %>%
+  summarise_all("mean") %>%
+  gather(bin_size, particle_number)
+sps_distrib$mean_bin_dimension = 0
+sps_distrib$diff_bin_dimension = 0
+
+
+#Define the size distribution of Bin.X as the mean between the boundaries of Bin.X and Bin.X+1
+sps_distrib[sps_distrib$bin_size == "n05", ]$mean_bin_dimension = (0.3 + 0.5) /
+  2
+sps_distrib[sps_distrib$bin_size == "n05_1", ]$mean_bin_dimension = (0.5 + 1) /
+  2
+sps_distrib[sps_distrib$bin_size == "n1_25", ]$mean_bin_dimension = (1 + 2.5) /
+  2
+sps_distrib[sps_distrib$bin_size == "n25_4", ]$mean_bin_dimension = (2.5 + 4) /
+  2
+sps_distrib[sps_distrib$bin_size == "n4_10", ]$mean_bin_dimension = (4 + 10) /
+  2
+
+
+sps_distrib[sps_distrib$bin_size == "n05", ]$diff_bin_dimension = log10(0.3) - log10(0.5)
+sps_distrib[sps_distrib$bin_size == "n05_1", ]$diff_bin_dimension = log10(0.5) - log10(1)
+sps_distrib[sps_distrib$bin_size == "n1_25", ]$diff_bin_dimension = log10(1) - log10(2.5)
+sps_distrib[sps_distrib$bin_size == "n25_4", ]$diff_bin_dimension = log10(2.5) - log10(4)
+sps_distrib[sps_distrib$bin_size == "n4_10", ]$diff_bin_dimension = log10(4) - log10(10)
+sps_distrib$sensor_type = "SPS030"
+
+
+
+
+sensors_distrib <-
+  bind_rows(sps_distrib, pms_distrib, opcr1_distrib)
+sensors_distrib
+
+```
+
+# Sensors averaged per model
+
+
+```{r}
+
+ops <- df_ops %>%
+  dplyr::select(-matches("Bin.1[1-7]")) %>%
+  dplyr::filter(exp != "", source != "", variation == "Stable") %>%
+  group_by(variation, source) %>%
+  summarise_all("mean") %>%
+  dplyr::select(starts_with("Bin."), variation, source) %>%
+  gather(bin_size, particle_number, -variation, -source) %>%
+  inner_join(
+    dplyr::select(ops_distrib, diff_bin_dimension, mean_bin_dimension,
+                  bin_size),
+    by = c("bin_size")
+  ) %>%
+  mutate(dN_dlog = particle_number / (-diff_bin_dimension))
+
+
+# For better visualisation, multiply sps by 100
+df_sensors[df_sensors$sensor_type == "SPS030",] <-
+  df_sensors[df_sensors$sensor_type == "SPS030",] %>%
+  mutate(n05 = 100 * n05,
+         n05_1 = 100 * n05_1,
+         n1_25 = 100 * n1_25)
+
+df_sensors[df_sensors$sensor_type == "PMS5003",] <-
+  df_sensors[df_sensors$sensor_type == "PMS5003",] %>%
+  mutate(
+    gr03um = 10 * gr03um,
+    gr10um = 10 * gr10um,
+    gr25um = 10 * gr25um
+  )
+
+
+p <- df_sensors %>%
+  dplyr::filter(exp != "", source != "") %>%
+  ungroup() %>%
+  dplyr::filter(variation == "Stable") %>%
+  group_by(sensor_type, source) %>%
+  dplyr::select(
+    -gr25_50um,-gr50_100um,-n25_4,-n4_10,-matches("Bin[5-9]$"),-matches("Bin1[0-5]")
+  ) %>%
+  dplyr::select(
+    sensor_type,
+    n05,
+    matches("^n[0-9]+_[0-9]+"),
+    matches("gr.*_.*um"),
+    starts_with("Bin"),-contains("MToF"),
+    source
+  ) %>%
+  summarise_all("mean") %>%
+  ungroup() %>%
+  pivot_longer(
+    cols = -c(sensor_type, source),
+    names_to = "bin_size",
+    values_to = "particle_number",
+    values_drop_na = TRUE
+  ) %>%
+  inner_join(dplyr::select(sensors_distrib, -particle_number),
+             by = c("sensor_type", "bin_size")) %>%
+  mutate(dN_dlog = particle_number / (-diff_bin_dimension)) %>%
+  ggplot(aes(
+    x = mean_bin_dimension,
+    y = dN_dlog,
+    colour = sensor_type,
+    linetype = source
+  )) +
+  geom_line() +
+  geom_point() +
+  geom_line(data = ops,
+            aes(
+              x = mean_bin_dimension,
+              y = dN_dlog,
+              colour = "OPS",
+              linetype = source
+            )) +
+  geom_point(data = ops,
+             aes(x = mean_bin_dimension, y = dN_dlog, colour = "OPS")) +
+  scale_y_log10(
+    breaks = trans_breaks("log10", function(x)
+      10 ^ x),
+    labels = trans_format("log10", math_format(10 ^ .x))
+  ) +
+  scale_x_log10() +
+  annotation_logticks(sides = "bl") +
+  #  ggtitle("Candle Stable") +
+  theme_bw() +
+  ylab(label = expression(frac("dN", "dlog(Dp)"))) +
+  xlab(label = "Dp (μm)") +
+  #facet_wrap(~source) +
+  labs(colour = "Instrument type")
+# scale_colour_manual(values = c("#1B9E77", "#D95F02", "#7570B3", "#E7298A", "#66A61E"))
+p
+
+ggsave(
+  filename = "../output/plots/distrib_candle_stable_wrapped_25um.png",
+  plot = p,
+  width = 180,
+  units = "mm"
+)
+#
+
+
+```
+
+
+
+# Per model
+
+## PMS
+
+
+```{r}
+
+
+
+ops <- df_ops %>%
+  dplyr::select(-matches("Bin.1[1-7]")) %>%
+  dplyr::filter(exp != "", source != "", variation == "Stable") %>%
+  group_by(variation, source) %>%
+  summarise_all("mean") %>%
+  dplyr::select(starts_with("Bin."), variation, source) %>%
+  gather(bin_size, particle_number,-variation,-source) %>%
+  inner_join(
+    dplyr::select(ops_distrib, diff_bin_dimension, mean_bin_dimension,
+                  bin_size),
+    by = c("bin_size")
+  ) %>%
+  mutate(dN_dlog = particle_number / (-diff_bin_dimension))
+
+
+p <- df_sensors %>%
+  dplyr::filter(exp != "", source != "") %>%
+  dplyr::filter(sensor_type == "PMS5003") %>%
+  ungroup() %>%
+  dplyr::filter(variation == "Stable") %>%
+  dplyr::select(
+    -gr25_50um,
+    -gr50_100um,
+    -n25_4,
+    -n4_10,
+    -matches("Bin[5-9]$"),
+    -matches("Bin1[0-5]")
+  ) %>%
+  dplyr::select(
+    sensor,
+    n05,
+    matches("^n[0-9]+_[0-9]+"),
+    matches("gr.*_.*um"),
+    starts_with("Bin"),
+    -contains("MToF"),
+    source,
+    sensor_type
+  ) %>%
+  group_by(sensor, sensor_type, source) %>%
+  summarise_all("mean") %>%
+  ungroup() %>%
+  pivot_longer(
+    cols = -c(sensor, source, sensor_type),
+    names_to = "bin_size",
+    values_to = "particle_number",
+    values_drop_na = TRUE
+  ) %>%
+  inner_join(dplyr::select(sensors_distrib,-particle_number),
+             by = c("sensor_type", "bin_size")) %>%
+  mutate(dN_dlog = particle_number / (-diff_bin_dimension)) %>%
+  ggplot(aes(x = mean_bin_dimension, y = dN_dlog, colour = sensor)) +
+  geom_line() +
+  geom_point() +
+  geom_line(data = ops,
+            aes(x = mean_bin_dimension, y = dN_dlog, colour = "OPS")) +
+  geom_point(data = ops,
+             aes(x = mean_bin_dimension, y = dN_dlog, colour = "OPS")) +
+  scale_y_log10(
+    breaks = trans_breaks("log10", function(x)
+      10 ^ x),
+    labels = trans_format("log10", math_format(10 ^ .x))
+  ) +
+  scale_x_log10() +
+  annotation_logticks(sides = "bl") +
+  #  ggtitle("Candle Stable") +
+  theme_bw() +
+  ylab(label = expression(frac("dN", "dlog(Dp)"))) +
+  xlab(label = "Dp (μm)") +
+  facet_wrap( ~ source) +
+  labs(colour = "Instrument type")
+# scale_colour_manual(values = c("#1B9E77", "#D95F02", "#7570B3", "#E7298A", "#66A61E"))
+p
+
+ggsave(
+  filename = "../output/plots/distrib_stable_wrapped_PMS5003_25um.png",
+  plot = p,
+  width = 180,
+  units = "mm"
+)
+
+
+
+```
+
+
+## SPS
+
+
+```{r}
+
+
+
+ops <- df_ops %>%
+  dplyr::select(-matches("Bin.1[1-7]")) %>%
+  dplyr::filter(exp != "", source != "", variation == "Stable") %>%
+  group_by(variation, source) %>%
+  summarise_all("mean") %>%
+  dplyr::select(starts_with("Bin."), variation, source) %>%
+  gather(bin_size, particle_number,-variation,-source) %>%
+  inner_join(
+    dplyr::select(ops_distrib, diff_bin_dimension, mean_bin_dimension,
+                  bin_size),
+    by = c("bin_size")
+  ) %>%
+  mutate(dN_dlog = particle_number / (-diff_bin_dimension))
+
+
+p <- df_sensors %>%
+  dplyr::filter(exp != "", source != "") %>%
+  dplyr::filter(sensor_type == "SPS030") %>%
+  ungroup() %>%
+  dplyr::filter(variation == "Stable") %>%
+  dplyr::select(
+    -gr25_50um,
+    -gr50_100um,
+    -n25_4,
+    -n4_10,
+    -matches("Bin[5-9]$"),
+    -matches("Bin1[0-5]")
+  ) %>%
+  dplyr::select(
+    sensor,
+    n05,
+    matches("^n[0-9]+_[0-9]+"),
+    matches("gr.*_.*um"),
+    starts_with("Bin"),
+    -contains("MToF"),
+    source,
+    sensor_type
+  ) %>%
+  group_by(sensor, sensor_type, source) %>%
+  summarise_all("mean") %>%
+  ungroup() %>%
+  pivot_longer(
+    cols = -c(sensor, source, sensor_type),
+    names_to = "bin_size",
+    values_to = "particle_number",
+    values_drop_na = TRUE
+  ) %>%
+  inner_join(dplyr::select(sensors_distrib,-particle_number),
+             by = c("sensor_type", "bin_size")) %>%
+  mutate(dN_dlog = particle_number / (-diff_bin_dimension)) %>%
+  ggplot(aes(x = mean_bin_dimension, y = dN_dlog, colour = sensor)) +
+  geom_line() +
+  geom_point() +
+  geom_line(data = ops,
+            aes(x = mean_bin_dimension, y = dN_dlog, colour = "OPS")) +
+  geom_point(data = ops,
+             aes(x = mean_bin_dimension, y = dN_dlog, colour = "OPS")) +
+  scale_y_log10(
+    breaks = trans_breaks("log10", function(x)
+      10 ^ x),
+    labels = trans_format("log10", math_format(10 ^ .x))
+  ) +
+  scale_x_log10() +
+  annotation_logticks(sides = "bl") +
+  #  ggtitle("Candle Stable") +
+  theme_bw() +
+  ylab(label = expression(frac("dN", "dlog(Dp)"))) +
+  xlab(label = "Dp (μm)") +
+  facet_wrap( ~ source) +
+  labs(colour = "Instrument type")
+# scale_colour_manual(values = c("#1B9E77", "#D95F02", "#7570B3", "#E7298A", "#66A61E"))
+p
+
+ggsave(
+  filename = "../output/plots/distrib_stable_wrapped_SPS30_25um.png",
+  plot = p,
+  width = 180,
+  units = "mm"
+)
+
+
+```
+
+
+## OPC-R1
+
+
+```{r}
+
+
+
+ops <- df_ops %>%
+  dplyr::select(-matches("Bin.1[1-7]")) %>%
+  dplyr::filter(exp != "", source != "", variation == "Stable") %>%
+  group_by(variation, source) %>%
+  summarise_all("mean") %>%
+  dplyr::select(starts_with("Bin."), variation, source) %>%
+  gather(bin_size, particle_number,-variation,-source) %>%
+  inner_join(
+    dplyr::select(ops_distrib, diff_bin_dimension, mean_bin_dimension,
+                  bin_size),
+    by = c("bin_size")
+  ) %>%
+  mutate(dN_dlog = particle_number / (-diff_bin_dimension))
+
+
+p <- df_sensors %>%
+  dplyr::filter(exp != "", source != "") %>%
+  dplyr::filter(sensor_type == "OPCR1") %>%
+  ungroup() %>%
+  dplyr::filter(variation == "Stable") %>%
+  dplyr::select(
+    -gr25_50um,
+    -gr50_100um,
+    -n25_4,
+    -n4_10,
+    -matches("Bin[5-9]$"),
+    -matches("Bin1[0-5]")
+  ) %>%
+  dplyr::select(
+    sensor,
+    n05,
+    matches("^n[0-9]+_[0-9]+"),
+    matches("gr.*_.*um"),
+    starts_with("Bin"),
+    -contains("MToF"),
+    source,
+    sensor_type
+  ) %>%
+  group_by(sensor, sensor_type, source) %>%
+  summarise_all("mean") %>%
+  ungroup() %>%
+  pivot_longer(
+    cols = -c(sensor, source, sensor_type),
+    names_to = "bin_size",
+    values_to = "particle_number",
+    values_drop_na = TRUE
+  ) %>%
+  inner_join(dplyr::select(sensors_distrib,-particle_number),
+             by = c("sensor_type", "bin_size")) %>%
+  mutate(dN_dlog = particle_number / (-diff_bin_dimension)) %>%
+  ggplot(aes(x = mean_bin_dimension, y = dN_dlog, colour = sensor)) +
+  geom_line() +
+  geom_point() +
+  geom_line(data = ops,
+            aes(x = mean_bin_dimension, y = dN_dlog, colour = "OPS")) +
+  geom_point(data = ops,
+             aes(x = mean_bin_dimension, y = dN_dlog, colour = "OPS")) +
+  scale_y_log10(
+    breaks = trans_breaks("log10", function(x)
+      10 ^ x),
+    labels = trans_format("log10", math_format(10 ^ .x))
+  ) +
+  scale_x_log10() +
+  annotation_logticks(sides = "bl") +
+  #  ggtitle("Candle Stable") +
+  theme_bw() +
+  ylab(label = expression(frac("dN", "dlog(Dp)"))) +
+  xlab(label = "Dp (μm)") +
+  facet_wrap( ~ source) +
+  labs(colour = "Instrument type")
+# scale_colour_manual(values = c("#1B9E77", "#D95F02", "#7570B3", "#E7298A", "#66A61E"))
+p
+
+ggsave(
+  filename = "../output/plots/distrib_stable_wrapped_OPCR1_25um.png",
+  plot = p,
+  width = 180,
+  units = "mm"
+)
+
+
+
+```

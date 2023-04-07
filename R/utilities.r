@@ -3,6 +3,7 @@ library(purrr)
 require(magrittr)
 require(ggplot2)
 require(tidyr)
+require(splitstackshape)
 
 # Convert bins from the OPS 3330 into bins for the different sensors Based on https://www.mdpi.com/1424-8220/18/9/2790/htm 
 # For the Plantower PMS5003
@@ -78,4 +79,29 @@ flag_cdt_data<-function(tmp, cdt){
                                                                         variation = as.character(cdt[i,]$variation))
   }
   return(tmp)
+}
+
+
+
+#' get_sensor_type
+#' Extract the sensor type from the sensor id
+#' sensor id must respect the format sensorType_idNumber
+#'
+#' @param df - dataframe containing the time series measurements of a network of PM sensors
+#'            with columns:
+#'             - sensor: sensor identification number - sensorType_idNumber
+#' 
+#' @param ... 
+#'
+#' @return dataframe with column sensor_type added
+#'
+#' @export
+#'
+#' @examples get_sensor_type(df)
+get_sensor_type <- function(df, ...){
+  
+  cSplit(indt=df,splitCols = c("sensor"),sep="-",direction="wide",drop=FALSE) %>%
+    dplyr::select(-sensor_2) %>%
+    rename(sensor_type = sensor_1)
+  
 }

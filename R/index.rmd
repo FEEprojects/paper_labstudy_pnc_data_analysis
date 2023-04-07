@@ -26,7 +26,8 @@ knitr::opts_chunk$set(fig.width=12, fig.height=8, fig.path='../docs/figs/index/'
 
 
 
-The underlying code repository is available at: XXXXXXX
+The underlying code repository is available at: 
+<https://github.com/FEEprojects/paper_labstudy_pnc_data_analysis>
 
 
 # How to use this folder

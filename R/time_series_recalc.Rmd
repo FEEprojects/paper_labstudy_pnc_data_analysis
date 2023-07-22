@@ -558,11 +558,11 @@ ggsave(
 
 group.colors <-
   c(
-    "gr03um" = "#A6CEE3",
-    "gr05um" = "#1F78B4",
-    "gr10um" = "#B2DF8A",
-    "gr25um" = "#33A02C",
-    "gr50um" = "#FB9A99"
+    "gr03_05um" = "#A6CEE3",
+    "gr05_10um" = "#1F78B4",
+    "gr10_25um" = "#B2DF8A",
+    "gr25_50um" = "#33A02C",
+    "gr50_100um" = "#FB9A99"
   )
 df_ops$reference <- "OPS"
 df_sensors$reference <- "sensors"
@@ -584,8 +584,8 @@ p_1 <- df_ops %>%
   geom_line(
     aes(
       x = date,
-      y = gr03um_ref,
-      colour = "gr03um",
+      y = gr03_05um_ref,
+      colour = "gr03_05",
       linetype = reference
     ),
     lwd = 0.4,
@@ -595,8 +595,8 @@ p_1 <- df_ops %>%
     data = df_sensors_ft,
     aes(
       x = date,
-      y = gr03um,
-      colour = "gr03um",
+      y = gr03_05um,
+      colour = "gr03_05um",
       linetype = reference
     ),
     lwd = 0.4,
@@ -629,8 +629,8 @@ p_2 <- df_ops %>%
   geom_line(
     aes(
       x = date,
-      y = gr05um_ref,
-      colour = "gr05um",
+      y = gr05_10um_ref,
+      colour = "gr05_10",
       linetype = reference
     ),
     lwd = 0.4,
@@ -640,8 +640,8 @@ p_2 <- df_ops %>%
     data = df_sensors_ft,
     aes(
       x = date,
-      y = gr05um,
-      colour = "gr05um",
+      y = gr05_10um,
+      colour = "gr05_10",
       linetype = reference
     ),
     lwd = 0.4,
@@ -676,8 +676,8 @@ p_3 <- df_ops %>%
   geom_line(
     aes(
       x = date,
-      y = gr10um_ref,
-      colour = "gr10um",
+      y = gr10_25um_ref,
+      colour = "gr10_25",
       linetype = reference
     ),
     lwd = 0.4,
@@ -687,8 +687,8 @@ p_3 <- df_ops %>%
     data = df_sensors_ft,
     aes(
       x = date,
-      y = gr10um,
-      colour = "gr10um",
+      y = gr10_25um,
+      colour = "gr10_25",
       linetype = reference
     ),
     lwd = 0.4,
@@ -714,49 +714,6 @@ p_3 <- df_ops %>%
   scale_y_log10()
 
 
-p_4 <- df_ops %>%
-  dplyr::filter(date >= as.POSIXct("2019-09-05 10:20:00") &
-                  date <= as.POSIXct("2019-09-05 11:12:00")) %>%
-  ggplot() +
-  geom_line(
-    aes(
-      x = date,
-      y = gr25um_ref,
-      colour = "gr25um",
-      linetype = reference
-    ),
-    lwd = 0.4,
-    colour = "#33A02C"
-  ) +
-  geom_line(
-    data = df_sensors_ft,
-    aes(
-      x = date,
-      y = gr25um,
-      colour = "gr25um",
-      linetype = reference
-    ),
-    lwd = 0.4,
-    colour = "#33A02C"
-  ) +
-   geom_vline(xintercept = as.POSIXct("2019-09-05 10:42:40 UTC"), linetype = 4, color = "black") + 
-  geom_text(data=data.frame(), aes(label = 'Candle', x = as.POSIXct("2019-09-05 10:25:40 UTC"), y = Inf),
-            hjust = 0, vjust = 1.5, size=2.2) +
-  geom_text(data=data.frame(), aes(label = 'Incense', x = as.POSIXct("2019-09-05 10:52:40 UTC"), y = Inf),
-            hjust = 0, vjust = 1.5, size=2.2) +
-  #scale_color_brewer(palette = "Paired") +
-  scale_fill_manual(values = group.colors) +
-  #  scale_fill_manual(values = c("#A6CEE3", "#1F78B4","#B2DF8A", "#A6CEE3", "#1F78B4","#B2DF8A")) +
-  custom_theme +
-  ylab(expression(paste(
-    "PNC (#/", cm ^ {
-      3
-    }, ")"
-  ))) +
-  xlab("Time of the day") +
-  annotation_logticks(sides = "l") +
-  labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
 
 
 
@@ -769,8 +726,8 @@ p <- df_ops %>%
   geom_line(
     aes(
       x = date,
-      y = gr03um_ref,
-      colour = "gr03um - 0.3 to 10\u03bcm",
+      y = gr03_05um_ref,
+      colour = "gr03_05 - 0.3 to 0.5\u03bcm",
       linetype = reference
     ),
     lwd = 0.4
@@ -778,16 +735,16 @@ p <- df_ops %>%
   geom_line(
     aes(
       x = date,
-      y = gr05um_ref,
-      colour = "gr05um - 0.5 to 10\u03bcm",
+      y = gr05_10um_ref,
+      colour = "gr05_10 - 0.5 to 1\u03bcm",
       linetype = reference
     ),
     lwd = 0.4
   ) +
   geom_line(aes(
     x = date,
-    y = gr10um_ref,
-    colour = "gr10um - 1 to 10\u03bcm",
+    y = gr10_25um_ref,
+    colour = "gr10_25 - 1 to 2.5\u03bcm",
     linetype = reference
   ),
   lwd = 0.4) +
@@ -795,8 +752,8 @@ p <- df_ops %>%
     data = df_sensors_ft,
     aes(
       x = date,
-      y = gr03um,
-      colour = "gr03um - 0.3 to 10\u03bcm",
+      y = gr03_05um,
+      colour = "gr03_05 - 0.3 to 0.5\u03bcm",
       linetype = reference
     ),
     lwd = 0.4
@@ -805,8 +762,8 @@ p <- df_ops %>%
     data = df_sensors_ft,
     aes(
       x = date,
-      y = gr05um,
-      colour = "gr05um - 0.5 to 10\u03bcm",
+      y = gr05_10um,
+      colour = "gr05_10 - 0.5 to 1\u03bcm",
       linetype = reference
     ),
     lwd = 0.4
@@ -815,31 +772,12 @@ p <- df_ops %>%
     data = df_sensors_ft,
     aes(
       x = date,
-      y = gr10um,
-      colour = "gr10um - 1 to 10\u03bcm",
+      y = gr10_25um,
+      colour = "gr10_25 - 1 to 2.5\u03bcm",
       linetype = reference
     ),
     lwd = 0.4
-  ) +
-  geom_line(
-    aes(
-      x = date,
-      y = gr25um_ref,
-      colour = "gr25um - 2.5 to 10\u03bcm",
-      linetype = reference
-    ),
-    lwd = 0.4
-  ) +
-  geom_line(
-    data = df_sensors_ft,
-    aes(
-      x = date,
-      y = gr25um,
-      colour = "gr25um - 2.5 to 10\u03bcm",
-      linetype = reference
-    ),
-    lwd = 0.4
-  ) +
+  )  +
    geom_vline(xintercept = as.POSIXct("2019-09-05 10:42:40 UTC"), linetype = 4, color = "black") + 
   geom_text(data=data.frame(), aes(label = 'Candle', x = as.POSIXct("2019-09-05 10:25:40 UTC"), y = Inf),
             hjust = 0, vjust = 1.5, size=2.2) +
@@ -884,12 +822,11 @@ pl <- plot_grid(
     label_x = c(0,-0.034)
   ),
   plot_grid(
+    NULL,
     p_3 + theme(legend.position = "none"),
-    p_4 + ylab(NULL) + theme(legend.position = "none"),
-    
-    labels = c("(c)", "(d)"),
-    rel_widths = c(1, 1),
-    label_size = 9,
+    NULL,
+    rel_widths = c(0.5, 1, 0.5),
+    labels = c("", "(c)", ""),
     nrow = 1,
     label_x = c(0,-0.034)
   ),
@@ -903,7 +840,7 @@ pl_legend <- plot_grid(pl,
   theme(plot.background = element_rect(fill = "white", colour = NA))
 
 ggsave(
-  filename = "../output/plots/time_series_exp2_pms5003_25um_orig.png",
+  filename = "../output/plots/time_series_exp2_pms5003_25um_recalc.png",
   pl_legend,
   width = 220,
   units = "mm",
@@ -926,9 +863,9 @@ df_sensors_ft <-
   df_sensors[df_sensors$sensor == "SPS030-60767820-25",] %>%
   dplyr::filter(date >= as.POSIXct("2019-09-05 10:20:00") &
                   date <= as.POSIXct("2019-09-05 11:12:00"))
-group.colors <- c("n05" = "#E31A1C",
-                  "n1" = "#FDBF6F",
-                  "n25" = "#FF7F00")
+group.colors <- c("n03_05" = "#E31A1C",
+                  "n05_1" = "#FDBF6F",
+                  "n1_25" = "#FF7F00")
 brewer.pal(n = 10, name = "Paired")
 
 p_1 <- df_ops %>%
@@ -937,14 +874,14 @@ p_1 <- df_ops %>%
   ggplot() +
   geom_line(aes(
     x = date,
-    y = n05_ref,
-    colour = "n05",
+    y = n03_05_ref,
+    colour = "n03_05",
     linetype = reference
   ), lwd = 0.4) +
   geom_line(data = df_sensors_ft, aes(
     x = date,
-    y = n05,
-    colour = "n05",
+    y = n03_05,
+    colour = "n03_05",
     linetype = reference
   )) +
    geom_vline(xintercept = as.POSIXct("2019-09-05 10:42:40 UTC"), linetype = 4, color = "black") + 
@@ -972,15 +909,15 @@ p_2 <- df_ops %>%
   ggplot() +
   geom_line(aes(
     x = date,
-    y = n1_ref,
-    colour = "n1",
+    y = n05_1_ref,
+    colour = "n05_1",
     linetype = reference
   ), lwd = 0.4) +
   geom_line(data = df_sensors_ft,
             aes(
               x = date,
-              y = n1,
-              colour = "n1",
+              y = n05_1,
+              colour = "n05_1",
               linetype = reference
             ),
             lwd = 0.4) +
@@ -1011,15 +948,15 @@ p_3 <- df_ops %>%
   geom_line(aes(
     x = date,
     y = n25_ref,
-    colour = "n25",
+    colour = "n1_25",
     linetype = reference
   ), lwd = 0.4) +
   geom_line(
     data = df_sensors_ft,
     aes(
       x = date,
-      y = n25,
-      colour = "n25",
+      y = n1_25,
+      colour = "n1_25",
       linetype = reference
     ),
     lwd = 0.4
@@ -1052,22 +989,22 @@ p <- df_ops %>%
   ggplot() +
   geom_line(aes(
     x = date,
-    y = n05_ref,
-    colour = "n05 - 0.3 to 0.5\u03bcm",
+    y = n03_05_ref,
+    colour = "n03_05 - 0.3 to 0.5\u03bcm",
     linetype = reference
   ),
   lwd = 0.4) +
   geom_line(data = df_sensors_ft,
             aes(
               x = date,
-              y = n05,
-              colour = "n05 - 0.3 to 0.5\u03bcm",
+              y = n03_05,
+              colour = "n03_05 - 0.3 to 0.5\u03bcm",
               linetype = reference
             )) +
   geom_line(aes(
     x = date,
-    y = n1_ref,
-    colour = "n1 - 0.3 to 1\u03bcm",
+    y = n05_1_ref,
+    colour = "n05_1 - 0.5 to 1\u03bcm",
     linetype = reference
   ),
   lwd = 0.4) +
@@ -1075,8 +1012,8 @@ p <- df_ops %>%
     data = df_sensors_ft,
     aes(
       x = date,
-      y = n1,
-      colour = "n1 - 0.3 to 1\u03bcm",
+      y = n05_1,
+      colour = "n05_1 - 0.5 to 1\u03bcm",
       linetype = reference
     ),
     lwd = 0.4
@@ -1084,7 +1021,7 @@ p <- df_ops %>%
   geom_line(aes(
     x = date,
     y = n25_ref,
-    colour = "n25 - 0.3 to 2.5\u03bcm",
+    colour = "n1_25 - 1 to 2.5\u03bcm",
     linetype = reference
   ),
   lwd = 0.4) +
@@ -1092,8 +1029,8 @@ p <- df_ops %>%
     data = df_sensors_ft,
     aes(
       x = date,
-      y = n25,
-      colour = "n25 - 0.3 to 2.5\u03bcm",
+      y = n1_25,
+      colour = "n1_25 - 1 to 2.5\u03bcm",
       linetype = reference
     ),
     lwd = 0.4
@@ -1150,7 +1087,7 @@ pl_legend <- plot_grid(pl,
 
 
 ggsave(
-  filename = "../output/plots/time_series_exp2_sps30_25um_orig.png",
+  filename = "../output/plots/time_series_exp2_sps30_25um_recalc.png",
   pl_legend,
   width = 220,
   units = "mm",
@@ -2659,23 +2596,23 @@ ggsave(
 df_sensors_ft <-
   df_sensors[df_sensors$sensor == "SPS030-60767820-25" &
                df_sensors$exp == "(1) RH=54%",]
-group.colors <- c("n05" = "#E31A1C",
-                  "n1" = "#FDBF6F",
-                  "n25" = "#FF7F00")
+group.colors <- c("n03_05" = "#E31A1C",
+                  "n05_1" = "#FDBF6F",
+                  "n1_25" = "#FF7F00")
 brewer.pal(n = 10, name = "Paired")
 
 p_1 <- df_ops[df_ops$exp == "(1) RH=54%",] %>%
   ggplot() +
   geom_line(aes(
     x = date,
-    y = n05_ref,
-    colour = "n05",
+    y = n03_05_ref,
+    colour = "n03_05",
     linetype = reference
   ), lwd = 0.4) +
   geom_line(data = df_sensors_ft, aes(
     x = date,
-    y = n05,
-    colour = "n05",
+    y = n03_05,
+    colour = "n03_05",
     linetype = reference
   )) +
   scale_colour_manual(values = group.colors) +
@@ -2696,15 +2633,15 @@ p_2 <- df_ops[df_ops$exp == "(1) RH=54%",] %>%
   ggplot() +
   geom_line(aes(
     x = date,
-    y = n1_ref,
-    colour = "n1",
+    y = n05_1_ref,
+    colour = "n05_1",
     linetype = reference
   ), lwd = 0.4) +
   geom_line(data = df_sensors_ft,
             aes(
               x = date,
-              y = n1,
-              colour = "n1",
+              y = n05_1,
+              colour = "n05_1",
               linetype = reference
             ),
             lwd = 0.4) +
@@ -2728,15 +2665,15 @@ p_3 <- df_ops[df_ops$exp == "(1) RH=54%",] %>%
   geom_line(aes(
     x = date,
     y = n25_ref,
-    colour = "n25",
+    colour = "n1_25",
     linetype = reference
   ), lwd = 0.4) +
   geom_line(
     data = df_sensors_ft,
     aes(
       x = date,
-      y = n25,
-      colour = "n25",
+      y = n1_25,
+      colour = "n1_25",
       linetype = reference
     ),
     lwd = 0.4
@@ -2762,22 +2699,22 @@ p <- df_ops[df_ops$exp == "(1) RH=54%",] %>%
   ggplot() +
   geom_line(aes(
     x = date,
-    y = n05_ref,
-    colour = "n05 - 0.3 to 0.5\u03bcm",
+    y = n03_05_ref,
+    colour = "n03_05 - 0.3 to 0.5\u03bcm",
     linetype = reference
   ),
   lwd = 0.4) +
   geom_line(data = df_sensors_ft,
             aes(
               x = date,
-              y = n05,
-              colour = "n05 - 0.3 to 0.5\u03bcm",
+              y = n03_05,
+              colour = "n03_05 - 0.3 to 0.5\u03bcm",
               linetype = reference
             )) +
   geom_line(aes(
     x = date,
-    y = n1_ref,
-    colour = "n1 - 0.3 to 1\u03bcm",
+    y = n05_1_ref,
+    colour = "n05_1 - 0.5 to 1\u03bcm",
     linetype = reference
   ),
   lwd = 0.4) +
@@ -2785,8 +2722,8 @@ p <- df_ops[df_ops$exp == "(1) RH=54%",] %>%
     data = df_sensors_ft,
     aes(
       x = date,
-      y = n1,
-      colour = "n1 - 0.3 to 1\u03bcm",
+      y = n05_1,
+      colour = "n05_1 - 0.5 to 1\u03bcm",
       linetype = reference
     ),
     lwd = 0.4
@@ -2794,7 +2731,7 @@ p <- df_ops[df_ops$exp == "(1) RH=54%",] %>%
   geom_line(aes(
     x = date,
     y = n25_ref,
-    colour = "n25 - 0.3 to 2.5\u03bcm",
+    colour = "n1_25 - 1 to 2.5\u03bcm",
     linetype = reference
   ),
   lwd = 0.4) +
@@ -2802,8 +2739,8 @@ p <- df_ops[df_ops$exp == "(1) RH=54%",] %>%
     data = df_sensors_ft,
     aes(
       x = date,
-      y = n25,
-      colour = "n25 - 0.3 to 2.5\u03bcm",
+      y = n1_25,
+      colour = "n1_25 - 1 to 2.5\u03bcm",
       linetype = reference
     ),
     lwd = 0.4
@@ -2853,7 +2790,7 @@ pl_legend <- plot_grid(pl,
 
 
 ggsave(
-  filename = "../output/plots/time_series_exp1_sps30_25um_orig.png",
+  filename = "../output/plots/time_series_exp1_sps30_25um_recalc.png",
   pl_legend,
   width = 200,
   units = "mm",
@@ -2870,23 +2807,23 @@ pl_legend
 df_sensors_ft <-
   df_sensors[df_sensors$sensor == "SPS030-60767820-25" &
                df_sensors$exp == "(3) RH=72%",]
-group.colors <- c("n05" = "#E31A1C",
-                  "n1" = "#FDBF6F",
-                  "n25" = "#FF7F00")
+group.colors <- c("n03_05" = "#E31A1C",
+                  "n05_1" = "#FDBF6F",
+                  "n1_25" = "#FF7F00")
 brewer.pal(n = 10, name = "Paired")
 
 p_1 <- df_ops[df_ops$exp == "(3) RH=72%",] %>%
   ggplot() +
   geom_line(aes(
     x = date,
-    y = n05_ref,
-    colour = "n05",
+    y = n03_05_ref,
+    colour = "n03_05",
     linetype = reference
   ), lwd = 0.4) +
   geom_line(data = df_sensors_ft, aes(
     x = date,
-    y = n05,
-    colour = "n05",
+    y = n03_05,
+    colour = "n03_05",
     linetype = reference
   )) +
   scale_colour_manual(values = group.colors) +
@@ -2907,15 +2844,15 @@ p_2 <- df_ops[df_ops$exp == "(3) RH=72%",] %>%
   ggplot() +
   geom_line(aes(
     x = date,
-    y = n1_ref,
-    colour = "n1",
+    y = n05_1_ref,
+    colour = "n05_1",
     linetype = reference
   ), lwd = 0.4) +
   geom_line(data = df_sensors_ft,
             aes(
               x = date,
-              y = n1,
-              colour = "n1",
+              y = n05_1,
+              colour = "n05_1",
               linetype = reference
             ),
             lwd = 0.4) +
@@ -2939,15 +2876,15 @@ p_3 <- df_ops[df_ops$exp == "(3) RH=72%",] %>%
   geom_line(aes(
     x = date,
     y = n25_ref,
-    colour = "n25",
+    colour = "n1_25",
     linetype = reference
   ), lwd = 0.4) +
   geom_line(
     data = df_sensors_ft,
     aes(
       x = date,
-      y = n25,
-      colour = "n25",
+      y = n1_25,
+      colour = "n1_25",
       linetype = reference
     ),
     lwd = 0.4
@@ -2973,22 +2910,22 @@ p <- df_ops[df_ops$exp == "(3) RH=72%",] %>%
   ggplot() +
   geom_line(aes(
     x = date,
-    y = n05_ref,
-    colour = "n05 - 0.3 to 0.5\u03bcm",
+    y = n03_05_ref,
+    colour = "n03_05 - 0.3 to 0.5\u03bcm",
     linetype = reference
   ),
   lwd = 0.4) +
   geom_line(data = df_sensors_ft,
             aes(
               x = date,
-              y = n05,
-              colour = "n05 - 0.3 to 0.5\u03bcm",
+              y = n03_05,
+              colour = "n03_05 - 0.3 to 0.5\u03bcm",
               linetype = reference
             )) +
   geom_line(aes(
     x = date,
-    y = n1_ref,
-    colour = "n1 - 0.3 to 1\u03bcm",
+    y = n05_1_ref,
+    colour = "n05_1 - 0.5 to 1\u03bcm",
     linetype = reference
   ),
   lwd = 0.4) +
@@ -2996,8 +2933,8 @@ p <- df_ops[df_ops$exp == "(3) RH=72%",] %>%
     data = df_sensors_ft,
     aes(
       x = date,
-      y = n1,
-      colour = "n1 - 0.3 to 1\u03bcm",
+      y = n05_1,
+      colour = "n05_1 - 0.5 to 1\u03bcm",
       linetype = reference
     ),
     lwd = 0.4
@@ -3005,7 +2942,7 @@ p <- df_ops[df_ops$exp == "(3) RH=72%",] %>%
   geom_line(aes(
     x = date,
     y = n25_ref,
-    colour = "n25 - 0.3 to 2.5\u03bcm",
+    colour = "n1_25 - 1 to 2.5\u03bcm",
     linetype = reference
   ),
   lwd = 0.4) +
@@ -3013,8 +2950,8 @@ p <- df_ops[df_ops$exp == "(3) RH=72%",] %>%
     data = df_sensors_ft,
     aes(
       x = date,
-      y = n25,
-      colour = "n25 - 0.3 to 2.5\u03bcm",
+      y = n1_25,
+      colour = "n1_25 - 1 to 2.5\u03bcm",
       linetype = reference
     ),
     lwd = 0.4
@@ -3064,7 +3001,7 @@ pl_legend <- plot_grid(pl,
 
 
 ggsave(
-  filename = "../output/plots/time_series_exp3_sps30_25um_orig.png",
+  filename = "../output/plots/time_series_exp3_sps30_25um_recalc.png",
   pl_legend,
   width = 200,
   units = "mm",
@@ -3081,23 +3018,23 @@ pl_legend
 df_sensors_ft <-
   df_sensors[df_sensors$sensor == "SPS030-60767820-25" &
                df_sensors$exp == "(4) RH=76%",]
-group.colors <- c("n05" = "#E31A1C",
-                  "n1" = "#FDBF6F",
-                  "n25" = "#FF7F00")
+group.colors <- c("n03_05" = "#E31A1C",
+                  "n05_1" = "#FDBF6F",
+                  "n1_25" = "#FF7F00")
 brewer.pal(n = 10, name = "Paired")
 
 p_1 <- df_ops[df_ops$exp == "(4) RH=76%",] %>%
   ggplot() +
   geom_line(aes(
     x = date,
-    y = n05_ref,
-    colour = "n05",
+    y = n03_05_ref,
+    colour = "n03_05",
     linetype = reference
   ), lwd = 0.4) +
   geom_line(data = df_sensors_ft, aes(
     x = date,
-    y = n05,
-    colour = "n05",
+    y = n03_05,
+    colour = "n03_05",
     linetype = reference
   )) +
   scale_colour_manual(values = group.colors) +
@@ -3118,15 +3055,15 @@ p_2 <- df_ops[df_ops$exp == "(4) RH=76%",] %>%
   ggplot() +
   geom_line(aes(
     x = date,
-    y = n1_ref,
-    colour = "n1",
+    y = n05_1_ref,
+    colour = "n05_1",
     linetype = reference
   ), lwd = 0.4) +
   geom_line(data = df_sensors_ft,
             aes(
               x = date,
-              y = n1,
-              colour = "n1",
+              y = n05_1,
+              colour = "n05_1",
               linetype = reference
             ),
             lwd = 0.4) +
@@ -3150,15 +3087,15 @@ p_3 <- df_ops[df_ops$exp == "(4) RH=76%",] %>%
   geom_line(aes(
     x = date,
     y = n25_ref,
-    colour = "n25",
+    colour = "n1_25",
     linetype = reference
   ), lwd = 0.4) +
   geom_line(
     data = df_sensors_ft,
     aes(
       x = date,
-      y = n25,
-      colour = "n25",
+      y = n1_25,
+      colour = "n1_25",
       linetype = reference
     ),
     lwd = 0.4
@@ -3184,22 +3121,22 @@ p <- df_ops[df_ops$exp == "(4) RH=76%",] %>%
   ggplot() +
   geom_line(aes(
     x = date,
-    y = n05_ref,
-    colour = "n05 - 0.3 to 0.5\u03bcm",
+    y = n03_05_ref,
+    colour = "n03_05 - 0.3 to 0.5\u03bcm",
     linetype = reference
   ),
   lwd = 0.4) +
   geom_line(data = df_sensors_ft,
             aes(
               x = date,
-              y = n05,
-              colour = "n05 - 0.3 to 0.5\u03bcm",
+              y = n03_05,
+              colour = "n03_05 - 0.3 to 0.5\u03bcm",
               linetype = reference
             )) +
   geom_line(aes(
     x = date,
-    y = n1_ref,
-    colour = "n1 - 0.3 to 1\u03bcm",
+    y = n05_1_ref,
+    colour = "n05_1 - 0.5 to 1\u03bcm",
     linetype = reference
   ),
   lwd = 0.4) +
@@ -3207,8 +3144,8 @@ p <- df_ops[df_ops$exp == "(4) RH=76%",] %>%
     data = df_sensors_ft,
     aes(
       x = date,
-      y = n1,
-      colour = "n1 - 0.3 to 1\u03bcm",
+      y = n05_1,
+      colour = "n05_1 - 0.5 to 1\u03bcm",
       linetype = reference
     ),
     lwd = 0.4
@@ -3216,7 +3153,7 @@ p <- df_ops[df_ops$exp == "(4) RH=76%",] %>%
   geom_line(aes(
     x = date,
     y = n25_ref,
-    colour = "n25 - 0.3 to 2.5\u03bcm",
+    colour = "n1_25 - 1 to 2.5\u03bcm",
     linetype = reference
   ),
   lwd = 0.4) +
@@ -3224,8 +3161,8 @@ p <- df_ops[df_ops$exp == "(4) RH=76%",] %>%
     data = df_sensors_ft,
     aes(
       x = date,
-      y = n25,
-      colour = "n25 - 0.3 to 2.5\u03bcm",
+      y = n1_25,
+      colour = "n1_25 - 1 to 2.5\u03bcm",
       linetype = reference
     ),
     lwd = 0.4
@@ -3275,7 +3212,7 @@ pl_legend <- plot_grid(pl,
 
 
 ggsave(
-  filename = "../output/plots/time_series_exp4_sps30_25um_orig.png",
+  filename = "../output/plots/time_series_exp4_sps30_25um_recalc.png",
   pl_legend,
   width = 200,
   units = "mm",
@@ -3293,23 +3230,23 @@ pl_legend
 df_sensors_ft <-
   df_sensors[df_sensors$sensor == "SPS030-60767820-25" &
                df_sensors$exp == "(5) RH=79%",]
-group.colors <- c("n05" = "#E31A1C",
-                  "n1" = "#FDBF6F",
-                  "n25" = "#FF7F00")
+group.colors <- c("n03_05" = "#E31A1C",
+                  "n05_1" = "#FDBF6F",
+                  "n1_25" = "#FF7F00")
 brewer.pal(n = 10, name = "Paired")
 
 p_1 <- df_ops[df_ops$exp == "(5) RH=79%",] %>%
   ggplot() +
   geom_line(aes(
     x = date,
-    y = n05_ref,
-    colour = "n05",
+    y = n03_05_ref,
+    colour = "n03_05",
     linetype = reference
   ), lwd = 0.4) +
   geom_line(data = df_sensors_ft, aes(
     x = date,
-    y = n05,
-    colour = "n05",
+    y = n03_05,
+    colour = "n03_05",
     linetype = reference
   )) +
   scale_colour_manual(values = group.colors) +
@@ -3330,15 +3267,15 @@ p_2 <- df_ops[df_ops$exp == "(5) RH=79%",] %>%
   ggplot() +
   geom_line(aes(
     x = date,
-    y = n1_ref,
-    colour = "n1",
+    y = n05_1_ref,
+    colour = "n05_1",
     linetype = reference
   ), lwd = 0.4) +
   geom_line(data = df_sensors_ft,
             aes(
               x = date,
-              y = n1,
-              colour = "n1",
+              y = n05_1,
+              colour = "n05_1",
               linetype = reference
             ),
             lwd = 0.4) +
@@ -3362,15 +3299,15 @@ p_3 <- df_ops[df_ops$exp == "(5) RH=79%",] %>%
   geom_line(aes(
     x = date,
     y = n25_ref,
-    colour = "n25",
+    colour = "n1_25",
     linetype = reference
   ), lwd = 0.4) +
   geom_line(
     data = df_sensors_ft,
     aes(
       x = date,
-      y = n25,
-      colour = "n25",
+      y = n1_25,
+      colour = "n1_25",
       linetype = reference
     ),
     lwd = 0.4
@@ -3396,22 +3333,22 @@ p <- df_ops[df_ops$exp == "(5) RH=79%",] %>%
   ggplot() +
   geom_line(aes(
     x = date,
-    y = n05_ref,
-    colour = "n05 - 0.3 to 0.5\u03bcm",
+    y = n03_05_ref,
+    colour = "n03_05 - 0.3 to 0.5\u03bcm",
     linetype = reference
   ),
   lwd = 0.4) +
   geom_line(data = df_sensors_ft,
             aes(
               x = date,
-              y = n05,
-              colour = "n05 - 0.3 to 0.5\u03bcm",
+              y = n03_05,
+              colour = "n03_05 - 0.3 to 0.5\u03bcm",
               linetype = reference
             )) +
   geom_line(aes(
     x = date,
-    y = n1_ref,
-    colour = "n1 - 0.3 to 1\u03bcm",
+    y = n05_1_ref,
+    colour = "n05_1 - 0.5 to 1\u03bcm",
     linetype = reference
   ),
   lwd = 0.4) +
@@ -3419,8 +3356,8 @@ p <- df_ops[df_ops$exp == "(5) RH=79%",] %>%
     data = df_sensors_ft,
     aes(
       x = date,
-      y = n1,
-      colour = "n1 - 0.3 to 1\u03bcm",
+      y = n05_1,
+      colour = "n05_1 - 0.5 to 1\u03bcm",
       linetype = reference
     ),
     lwd = 0.4
@@ -3428,7 +3365,7 @@ p <- df_ops[df_ops$exp == "(5) RH=79%",] %>%
   geom_line(aes(
     x = date,
     y = n25_ref,
-    colour = "n25 - 0.3 to 2.5\u03bcm",
+    colour = "n1_25 - 1 to 2.5\u03bcm",
     linetype = reference
   ),
   lwd = 0.4) +
@@ -3436,8 +3373,8 @@ p <- df_ops[df_ops$exp == "(5) RH=79%",] %>%
     data = df_sensors_ft,
     aes(
       x = date,
-      y = n25,
-      colour = "n25 - 0.3 to 2.5\u03bcm",
+      y = n1_25,
+      colour = "n1_25 - 1 to 2.5\u03bcm",
       linetype = reference
     ),
     lwd = 0.4
@@ -3487,7 +3424,7 @@ pl_legend <- plot_grid(pl,
 
 
 ggsave(
-  filename = "../output/plots/time_series_exp5_sps30_25um_orig.png",
+  filename = "../output/plots/time_series_exp5_sps30_25um_recalc.png",
   pl_legend,
   width = 200,
   units = "mm",
@@ -3509,10 +3446,10 @@ pl_legend
 
 group.colors <-
   c(
-    "gr03um" = "#A6CEE3",
-    "gr05um" = "#1F78B4",
-    "gr10um" = "#B2DF8A",
-    "gr25um" = "#33A02C",
+    "gr03_05" = "#A6CEE3",
+    "gr05_10" = "#1F78B4",
+    "gr10_25" = "#B2DF8A",
+    "gr25_50" = "#33A02C",
     "gr50um" = "#FB9A99"
   )
 df_ops$reference <- "OPS"
@@ -3532,8 +3469,8 @@ p_1 <- df_ops[df_ops$exp == "(1) RH=54%",] %>%
   geom_line(
     aes(
       x = date,
-      y = gr03um_ref,
-      colour = "gr03um",
+      y = gr03_05um_ref,
+      colour = "gr03_05",
       linetype = reference
     ),
     lwd = 0.4,
@@ -3543,8 +3480,8 @@ p_1 <- df_ops[df_ops$exp == "(1) RH=54%",] %>%
     data = df_sensors_ft,
     aes(
       x = date,
-      y = gr03um,
-      colour = "gr03um",
+      y = gr03_05um,
+      colour = "gr03_05",
       linetype = reference
     ),
     lwd = 0.4,
@@ -3570,8 +3507,8 @@ p_2 <- df_ops[df_ops$exp == "(1) RH=54%",] %>%
   geom_line(
     aes(
       x = date,
-      y = gr05um_ref,
-      colour = "gr05um",
+      y = gr05_10um_ref,
+      colour = "gr05_10",
       linetype = reference
     ),
     lwd = 0.4,
@@ -3581,8 +3518,8 @@ p_2 <- df_ops[df_ops$exp == "(1) RH=54%",] %>%
     data = df_sensors_ft,
     aes(
       x = date,
-      y = gr05um,
-      colour = "gr05um",
+      y = gr05_10um,
+      colour = "gr05_10",
       linetype = reference
     ),
     lwd = 0.4,
@@ -3610,8 +3547,8 @@ p_3 <- df_ops[df_ops$exp == "(1) RH=54%",] %>%
   geom_line(
     aes(
       x = date,
-      y = gr10um_ref,
-      colour = "gr10um",
+      y = gr10_25um_ref,
+      colour = "gr10_25",
       linetype = reference
     ),
     lwd = 0.4,
@@ -3621,8 +3558,8 @@ p_3 <- df_ops[df_ops$exp == "(1) RH=54%",] %>%
     data = df_sensors_ft,
     aes(
       x = date,
-      y = gr10um,
-      colour = "gr10um",
+      y = gr10_25um,
+      colour = "gr10_25",
       linetype = reference
     ),
     lwd = 0.4,
@@ -3643,42 +3580,7 @@ p_3 <- df_ops[df_ops$exp == "(1) RH=54%",] %>%
   scale_y_log10()
 
 
-p_4 <- df_ops[df_ops$exp == "(1) RH=54%",] %>%
-  ggplot() +
-  geom_line(
-    aes(
-      x = date,
-      y = gr25um_ref,
-      colour = "gr25um",
-      linetype = reference
-    ),
-    lwd = 0.4,
-    colour = "#33A02C"
-  ) +
-  geom_line(
-    data = df_sensors_ft,
-    aes(
-      x = date,
-      y = gr25um,
-      colour = "gr25um",
-      linetype = reference
-    ),
-    lwd = 0.4,
-    colour = "#33A02C"
-  ) +
-  #scale_color_brewer(palette = "Paired") +
-  scale_fill_manual(values = group.colors) +
-  #  scale_fill_manual(values = c("#A6CEE3", "#1F78B4","#B2DF8A", "#A6CEE3", "#1F78B4","#B2DF8A")) +
-  custom_theme +
-  ylab(expression(paste(
-    "PNC (#/", cm ^ {
-      3
-    }, ")"
-  ))) +
-  xlab("Time of the day") +
-  annotation_logticks(sides = "l") +
-  labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+
 
 
 
@@ -3689,8 +3591,8 @@ p <- df_ops[df_ops$exp == "(1) RH=54%",] %>%
   geom_line(
     aes(
       x = date,
-      y = gr03um_ref,
-      colour = "gr03um - 0.3 to 10\u03bcm",
+      y = gr03_05um_ref,
+      colour = "gr03_05 - 0.3 to 0.5\u03bcm",
       linetype = reference
     ),
     lwd = 0.4
@@ -3698,16 +3600,16 @@ p <- df_ops[df_ops$exp == "(1) RH=54%",] %>%
   geom_line(
     aes(
       x = date,
-      y = gr05um_ref,
-      colour = "gr05um - 0.5 to 10\u03bcm",
+      y = gr05_10um_ref,
+      colour = "gr05_10 - 0.5 to 1\u03bcm",
       linetype = reference
     ),
     lwd = 0.4
   ) +
   geom_line(aes(
     x = date,
-    y = gr10um_ref,
-    colour = "gr10um - 1 to 10\u03bcm",
+    y = gr10_25um_ref,
+    colour = "gr10_25 - 1 to 2.5\u03bcm",
     linetype = reference
   ),
   lwd = 0.4) +
@@ -3715,8 +3617,8 @@ p <- df_ops[df_ops$exp == "(1) RH=54%",] %>%
     data = df_sensors_ft,
     aes(
       x = date,
-      y = gr03um,
-      colour = "gr03um - 0.3 to 10\u03bcm",
+      y = gr03_05um,
+      colour = "gr03_05 - 0.3 to 0.5\u03bcm",
       linetype = reference
     ),
     lwd = 0.4
@@ -3725,8 +3627,8 @@ p <- df_ops[df_ops$exp == "(1) RH=54%",] %>%
     data = df_sensors_ft,
     aes(
       x = date,
-      y = gr05um,
-      colour = "gr05um - 0.5 to 10\u03bcm",
+      y = gr05_10um,
+      colour = "gr05_10 - 0.5 to 1\u03bcm",
       linetype = reference
     ),
     lwd = 0.4
@@ -3735,27 +3637,8 @@ p <- df_ops[df_ops$exp == "(1) RH=54%",] %>%
     data = df_sensors_ft,
     aes(
       x = date,
-      y = gr10um,
-      colour = "gr10um - 1 to 10\u03bcm",
-      linetype = reference
-    ),
-    lwd = 0.4
-  ) +
-  geom_line(
-    aes(
-      x = date,
-      y = gr25um_ref,
-      colour = "gr25um - 2.5 to 10\u03bcm",
-      linetype = reference
-    ),
-    lwd = 0.4
-  ) +
-  geom_line(
-    data = df_sensors_ft,
-    aes(
-      x = date,
-      y = gr25um,
-      colour = "gr25um - 2.5 to 10\u03bcm",
+      y = gr10_25um,
+      colour = "gr10_25 - 1 to 2.5\u03bcm",
       linetype = reference
     ),
     lwd = 0.4
@@ -3797,19 +3680,23 @@ pl <- plot_grid(
   plot_grid(
     p_1 + theme(legend.position = "none"),
     p_2 + ylab(NULL) + theme(legend.position = "none"),
-    nrow = 1
-    #labels = c("(a)", "(b)", "(C)")
+    nrow = 1,
+    labels = c("(a)", "(b)"),
+    label_size = 9,
+    label_x = c(0,-0.034)
   ),
   plot_grid(
+    NULL,
     p_3 + theme(legend.position = "none"),
-    p_4 + theme(legend.position = "none"),
-    
-    #labels = c("", "(d)", "(e)", ""),
-    rel_widths = c(1, 1),
-    nrow = 1
+    NULL,
+    rel_widths = c(0.5, 1, 0.5),
+    labels = c("", "(c)", ""),
+    nrow = 1,
+    label_x = c(0,-0.034)
   ),
   nrow = 2
 )
+
 
 pl_legend <- plot_grid(pl,
                        legend,
@@ -3818,7 +3705,7 @@ pl_legend <- plot_grid(pl,
   theme(plot.background = element_rect(fill = "white", colour = NA))
 
 ggsave(
-  filename = "../output/plots/time_series_exp1_pms5003_25um_orig.png",
+  filename = "../output/plots/time_series_exp1_pms5003_25um_recalc.png",
   pl_legend,
   width = 200,
   units = "mm",
@@ -3839,10 +3726,10 @@ pl_legend
 
 group.colors <-
   c(
-    "gr03um" = "#A6CEE3",
-    "gr05um" = "#1F78B4",
-    "gr10um" = "#B2DF8A",
-    "gr25um" = "#33A02C",
+    "gr03_05" = "#A6CEE3",
+    "gr05_10" = "#1F78B4",
+    "gr10_25" = "#B2DF8A",
+    "gr25_50" = "#33A02C",
     "gr50um" = "#FB9A99"
   )
 df_ops$reference <- "OPS"
@@ -3862,8 +3749,8 @@ p_1 <- df_ops[df_ops$exp == "(3) RH=72%",] %>%
   geom_line(
     aes(
       x = date,
-      y = gr03um_ref,
-      colour = "gr03um",
+      y = gr03_05um_ref,
+      colour = "gr03_05",
       linetype = reference
     ),
     lwd = 0.4,
@@ -3873,8 +3760,8 @@ p_1 <- df_ops[df_ops$exp == "(3) RH=72%",] %>%
     data = df_sensors_ft,
     aes(
       x = date,
-      y = gr03um,
-      colour = "gr03um",
+      y = gr03_05um,
+      colour = "gr03_05",
       linetype = reference
     ),
     lwd = 0.4,
@@ -3900,8 +3787,8 @@ p_2 <- df_ops[df_ops$exp == "(3) RH=72%",] %>%
   geom_line(
     aes(
       x = date,
-      y = gr05um_ref,
-      colour = "gr05um",
+      y = gr05_10um_ref,
+      colour = "gr05_10",
       linetype = reference
     ),
     lwd = 0.4,
@@ -3911,8 +3798,8 @@ p_2 <- df_ops[df_ops$exp == "(3) RH=72%",] %>%
     data = df_sensors_ft,
     aes(
       x = date,
-      y = gr05um,
-      colour = "gr05um",
+      y = gr05_10um,
+      colour = "gr05_10",
       linetype = reference
     ),
     lwd = 0.4,
@@ -3940,8 +3827,8 @@ p_3 <- df_ops[df_ops$exp == "(3) RH=72%",] %>%
   geom_line(
     aes(
       x = date,
-      y = gr10um_ref,
-      colour = "gr10um",
+      y = gr10_25um_ref,
+      colour = "gr10_25",
       linetype = reference
     ),
     lwd = 0.4,
@@ -3951,8 +3838,8 @@ p_3 <- df_ops[df_ops$exp == "(3) RH=72%",] %>%
     data = df_sensors_ft,
     aes(
       x = date,
-      y = gr10um,
-      colour = "gr10um",
+      y = gr10_25um,
+      colour = "gr10_25",
       linetype = reference
     ),
     lwd = 0.4,
@@ -3972,43 +3859,6 @@ p_3 <- df_ops[df_ops$exp == "(3) RH=72%",] %>%
   labs(colour = "Bin sizes", linetype = "Instrument") +
   scale_y_log10()
 
-
-p_4 <- df_ops[df_ops$exp == "(3) RH=72%",] %>%
-  ggplot() +
-  geom_line(
-    aes(
-      x = date,
-      y = gr25um_ref,
-      colour = "gr25um",
-      linetype = reference
-    ),
-    lwd = 0.4,
-    colour = "#33A02C"
-  ) +
-  geom_line(
-    data = df_sensors_ft,
-    aes(
-      x = date,
-      y = gr25um,
-      colour = "gr25um",
-      linetype = reference
-    ),
-    lwd = 0.4,
-    colour = "#33A02C"
-  ) +
-  #scale_color_brewer(palette = "Paired") +
-  scale_fill_manual(values = group.colors) +
-  #  scale_fill_manual(values = c("#A6CEE3", "#1F78B4","#B2DF8A", "#A6CEE3", "#1F78B4","#B2DF8A")) +
-  custom_theme +
-  ylab(expression(paste(
-    "PNC (#/", cm ^ {
-      3
-    }, ")"
-  ))) +
-  xlab("Time of the day") +
-  annotation_logticks(sides = "l") +
-  labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
 
 
 
@@ -4019,8 +3869,8 @@ p <- df_ops[df_ops$exp == "(3) RH=72%",] %>%
   geom_line(
     aes(
       x = date,
-      y = gr03um_ref,
-      colour = "gr03um - 0.3 to 10\u03bcm",
+      y = gr03_05um_ref,
+      colour = "gr03_05 - 0.3 to 0.5\u03bcm",
       linetype = reference
     ),
     lwd = 0.4
@@ -4028,16 +3878,16 @@ p <- df_ops[df_ops$exp == "(3) RH=72%",] %>%
   geom_line(
     aes(
       x = date,
-      y = gr05um_ref,
-      colour = "gr05um - 0.5 to 10\u03bcm",
+      y = gr05_10um_ref,
+      colour = "gr05_10 - 0.5 to 1\u03bcm",
       linetype = reference
     ),
     lwd = 0.4
   ) +
   geom_line(aes(
     x = date,
-    y = gr10um_ref,
-    colour = "gr10um - 1 to 10\u03bcm",
+    y = gr10_25um_ref,
+    colour = "gr10_25 - 1 to 2.5\u03bcm",
     linetype = reference
   ),
   lwd = 0.4) +
@@ -4045,8 +3895,8 @@ p <- df_ops[df_ops$exp == "(3) RH=72%",] %>%
     data = df_sensors_ft,
     aes(
       x = date,
-      y = gr03um,
-      colour = "gr03um - 0.3 to 10\u03bcm",
+      y = gr03_05um,
+      colour = "gr03_05 - 0.3 to 0.5\u03bcm",
       linetype = reference
     ),
     lwd = 0.4
@@ -4055,8 +3905,8 @@ p <- df_ops[df_ops$exp == "(3) RH=72%",] %>%
     data = df_sensors_ft,
     aes(
       x = date,
-      y = gr05um,
-      colour = "gr05um - 0.5 to 10\u03bcm",
+      y = gr05_10um,
+      colour = "gr05_10 - 0.5 to 1\u03bcm",
       linetype = reference
     ),
     lwd = 0.4
@@ -4065,27 +3915,8 @@ p <- df_ops[df_ops$exp == "(3) RH=72%",] %>%
     data = df_sensors_ft,
     aes(
       x = date,
-      y = gr10um,
-      colour = "gr10um - 1 to 10\u03bcm",
-      linetype = reference
-    ),
-    lwd = 0.4
-  ) +
-  geom_line(
-    aes(
-      x = date,
-      y = gr25um_ref,
-      colour = "gr25um - 2.5 to 10\u03bcm",
-      linetype = reference
-    ),
-    lwd = 0.4
-  ) +
-  geom_line(
-    data = df_sensors_ft,
-    aes(
-      x = date,
-      y = gr25um,
-      colour = "gr25um - 2.5 to 10\u03bcm",
+      y = gr10_25um,
+      colour = "gr10_25 - 1 to 2.5\u03bcm",
       linetype = reference
     ),
     lwd = 0.4
@@ -4127,19 +3958,23 @@ pl <- plot_grid(
   plot_grid(
     p_1 + theme(legend.position = "none"),
     p_2 + ylab(NULL) + theme(legend.position = "none"),
-    nrow = 1
-    #labels = c("(a)", "(b)", "(C)")
+    nrow = 1,
+    labels = c("(a)", "(b)"),
+    label_size = 9,
+    label_x = c(0,-0.034)
   ),
   plot_grid(
+    NULL,
     p_3 + theme(legend.position = "none"),
-    p_4 + theme(legend.position = "none"),
-    
-    #labels = c("", "(d)", "(e)", ""),
-    rel_widths = c(1, 1),
-    nrow = 1
+    NULL,
+    rel_widths = c(0.5, 1, 0.5),
+    labels = c("", "(c)", ""),
+    nrow = 1,
+    label_x = c(0,-0.034)
   ),
   nrow = 2
 )
+
 
 pl_legend <- plot_grid(pl,
                        legend,
@@ -4148,7 +3983,7 @@ pl_legend <- plot_grid(pl,
   theme(plot.background = element_rect(fill = "white", colour = NA))
 
 ggsave(
-  filename = "../output/plots/time_series_exp3_pms5003_25um_orig.png",
+  filename = "../output/plots/time_series_exp3_pms5003_25um_recalc.png",
   pl_legend,
   width = 200,
   units = "mm",
@@ -4168,10 +4003,10 @@ pl_legend
 
 group.colors <-
   c(
-    "gr03um" = "#A6CEE3",
-    "gr05um" = "#1F78B4",
-    "gr10um" = "#B2DF8A",
-    "gr25um" = "#33A02C",
+    "gr03_05" = "#A6CEE3",
+    "gr05_10" = "#1F78B4",
+    "gr10_25" = "#B2DF8A",
+    "gr25_50" = "#33A02C",
     "gr50um" = "#FB9A99"
   )
 df_ops$reference <- "OPS"
@@ -4191,8 +4026,8 @@ p_1 <- df_ops[df_ops$exp == "(4) RH=76%",] %>%
   geom_line(
     aes(
       x = date,
-      y = gr03um_ref,
-      colour = "gr03um",
+      y = gr03_05um_ref,
+      colour = "gr03_05",
       linetype = reference
     ),
     lwd = 0.4,
@@ -4202,8 +4037,8 @@ p_1 <- df_ops[df_ops$exp == "(4) RH=76%",] %>%
     data = df_sensors_ft,
     aes(
       x = date,
-      y = gr03um,
-      colour = "gr03um",
+      y = gr03_05um,
+      colour = "gr03_05",
       linetype = reference
     ),
     lwd = 0.4,
@@ -4229,8 +4064,8 @@ p_2 <- df_ops[df_ops$exp == "(4) RH=76%",] %>%
   geom_line(
     aes(
       x = date,
-      y = gr05um_ref,
-      colour = "gr05um",
+      y = gr05_10um_ref,
+      colour = "gr05_10",
       linetype = reference
     ),
     lwd = 0.4,
@@ -4240,8 +4075,8 @@ p_2 <- df_ops[df_ops$exp == "(4) RH=76%",] %>%
     data = df_sensors_ft,
     aes(
       x = date,
-      y = gr05um,
-      colour = "gr05um",
+      y = gr05_10um,
+      colour = "gr05_10",
       linetype = reference
     ),
     lwd = 0.4,
@@ -4269,8 +4104,8 @@ p_3 <- df_ops[df_ops$exp == "(4) RH=76%",] %>%
   geom_line(
     aes(
       x = date,
-      y = gr10um_ref,
-      colour = "gr10um",
+      y = gr10_25um_ref,
+      colour = "gr10_25",
       linetype = reference
     ),
     lwd = 0.4,
@@ -4280,50 +4115,12 @@ p_3 <- df_ops[df_ops$exp == "(4) RH=76%",] %>%
     data = df_sensors_ft,
     aes(
       x = date,
-      y = gr10um,
-      colour = "gr10um",
+      y = gr10_25um,
+      colour = "gr10_25",
       linetype = reference
     ),
     lwd = 0.4,
     colour = "#B2DF8A"
-  ) +
-  #scale_color_brewer(palette = "Paired") +
-  scale_fill_manual(values = group.colors) +
-  #  scale_fill_manual(values = c("#A6CEE3", "#1F78B4","#B2DF8A", "#A6CEE3", "#1F78B4","#B2DF8A")) +
-  custom_theme +
-  ylab(expression(paste(
-    "PNC (#/", cm ^ {
-      3
-    }, ")"
-  ))) +
-  xlab("Time of the day") +
-  annotation_logticks(sides = "l") +
-  labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
-
-
-p_4 <- df_ops[df_ops$exp == "(4) RH=76%",] %>%
-  ggplot() +
-  geom_line(
-    aes(
-      x = date,
-      y = gr25um_ref,
-      colour = "gr25um",
-      linetype = reference
-    ),
-    lwd = 0.4,
-    colour = "#33A02C"
-  ) +
-  geom_line(
-    data = df_sensors_ft,
-    aes(
-      x = date,
-      y = gr25um,
-      colour = "gr25um",
-      linetype = reference
-    ),
-    lwd = 0.4,
-    colour = "#33A02C"
   ) +
   #scale_color_brewer(palette = "Paired") +
   scale_fill_manual(values = group.colors) +
@@ -4348,8 +4145,8 @@ p <- df_ops[df_ops$exp == "(4) RH=76%",] %>%
   geom_line(
     aes(
       x = date,
-      y = gr03um_ref,
-      colour = "gr03um - 0.3 to 10\u03bcm",
+      y = gr03_05um_ref,
+      colour = "gr03_05 - 0.3 to 0.5\u03bcm",
       linetype = reference
     ),
     lwd = 0.4
@@ -4357,16 +4154,16 @@ p <- df_ops[df_ops$exp == "(4) RH=76%",] %>%
   geom_line(
     aes(
       x = date,
-      y = gr05um_ref,
-      colour = "gr05um - 0.5 to 10\u03bcm",
+      y = gr05_10um_ref,
+      colour = "gr05_10 - 0.5 to 1\u03bcm",
       linetype = reference
     ),
     lwd = 0.4
   ) +
   geom_line(aes(
     x = date,
-    y = gr10um_ref,
-    colour = "gr10um - 1 to 10\u03bcm",
+    y = gr10_25um_ref,
+    colour = "gr10_25 - 1 to 2.5\u03bcm",
     linetype = reference
   ),
   lwd = 0.4) +
@@ -4374,8 +4171,8 @@ p <- df_ops[df_ops$exp == "(4) RH=76%",] %>%
     data = df_sensors_ft,
     aes(
       x = date,
-      y = gr03um,
-      colour = "gr03um - 0.3 to 10\u03bcm",
+      y = gr03_05um,
+      colour = "gr03_05 - 0.3 to 0.5\u03bcm",
       linetype = reference
     ),
     lwd = 0.4
@@ -4384,8 +4181,8 @@ p <- df_ops[df_ops$exp == "(4) RH=76%",] %>%
     data = df_sensors_ft,
     aes(
       x = date,
-      y = gr05um,
-      colour = "gr05um - 0.5 to 10\u03bcm",
+      y = gr05_10um,
+      colour = "gr05_10 - 0.5 to 1\u03bcm",
       linetype = reference
     ),
     lwd = 0.4
@@ -4394,31 +4191,12 @@ p <- df_ops[df_ops$exp == "(4) RH=76%",] %>%
     data = df_sensors_ft,
     aes(
       x = date,
-      y = gr10um,
-      colour = "gr10um - 1 to 10\u03bcm",
+      y = gr10_25um,
+      colour = "gr10_25 - 1 to 2.5\u03bcm",
       linetype = reference
     ),
     lwd = 0.4
-  ) +
-  geom_line(
-    aes(
-      x = date,
-      y = gr25um_ref,
-      colour = "gr25um - 2.5 to 10\u03bcm",
-      linetype = reference
-    ),
-    lwd = 0.4
-  ) +
-  geom_line(
-    data = df_sensors_ft,
-    aes(
-      x = date,
-      y = gr25um,
-      colour = "gr25um - 2.5 to 10\u03bcm",
-      linetype = reference
-    ),
-    lwd = 0.4
-  ) +
+  )  +
   #scale_color_brewer(palette = "Paired") +
   scale_color_manual(values = c(
     "#A6CEE3",
@@ -4456,19 +4234,23 @@ pl <- plot_grid(
   plot_grid(
     p_1 + theme(legend.position = "none"),
     p_2 + ylab(NULL) + theme(legend.position = "none"),
-    nrow = 1
-    #labels = c("(a)", "(b)", "(C)")
+    nrow = 1,
+    labels = c("(a)", "(b)"),
+    label_size = 9,
+    label_x = c(0,-0.034)
   ),
   plot_grid(
+    NULL,
     p_3 + theme(legend.position = "none"),
-    p_4 + theme(legend.position = "none"),
-    
-    #labels = c("", "(d)", "(e)", ""),
-    rel_widths = c(1, 1),
-    nrow = 1
+    NULL,
+    rel_widths = c(0.5, 1, 0.5),
+    labels = c("", "(c)", ""),
+    nrow = 1,
+    label_x = c(0,-0.034)
   ),
   nrow = 2
 )
+
 
 pl_legend <- plot_grid(pl,
                        legend,
@@ -4477,7 +4259,7 @@ pl_legend <- plot_grid(pl,
   theme(plot.background = element_rect(fill = "white", colour = NA))
 
 ggsave(
-  filename = "../output/plots/time_series_exp4_pms5003_25um_orig.png",
+  filename = "../output/plots/time_series_exp4_pms5003_25um_recalc.png",
   pl_legend,
   width = 200,
   units = "mm",
@@ -4499,10 +4281,10 @@ pl_legend
 
 group.colors <-
   c(
-    "gr03um" = "#A6CEE3",
-    "gr05um" = "#1F78B4",
-    "gr10um" = "#B2DF8A",
-    "gr25um" = "#33A02C",
+    "gr03_05" = "#A6CEE3",
+    "gr05_10" = "#1F78B4",
+    "gr10_25" = "#B2DF8A",
+    "gr25_50" = "#33A02C",
     "gr50um" = "#FB9A99"
   )
 df_ops$reference <- "OPS"
@@ -4522,8 +4304,8 @@ p_1 <- df_ops[df_ops$exp == "(5) RH=79%",] %>%
   geom_line(
     aes(
       x = date,
-      y = gr03um_ref,
-      colour = "gr03um",
+      y = gr03_05um_ref,
+      colour = "gr03_05",
       linetype = reference
     ),
     lwd = 0.4,
@@ -4533,8 +4315,8 @@ p_1 <- df_ops[df_ops$exp == "(5) RH=79%",] %>%
     data = df_sensors_ft,
     aes(
       x = date,
-      y = gr03um,
-      colour = "gr03um",
+      y = gr03_05um,
+      colour = "gr03_05",
       linetype = reference
     ),
     lwd = 0.4,
@@ -4560,8 +4342,8 @@ p_2 <- df_ops[df_ops$exp == "(5) RH=79%",] %>%
   geom_line(
     aes(
       x = date,
-      y = gr05um_ref,
-      colour = "gr05um",
+      y = gr05_10um_ref,
+      colour = "gr05_10",
       linetype = reference
     ),
     lwd = 0.4,
@@ -4571,8 +4353,8 @@ p_2 <- df_ops[df_ops$exp == "(5) RH=79%",] %>%
     data = df_sensors_ft,
     aes(
       x = date,
-      y = gr05um,
-      colour = "gr05um",
+      y = gr05_10um,
+      colour = "gr05_10",
       linetype = reference
     ),
     lwd = 0.4,
@@ -4600,8 +4382,8 @@ p_3 <- df_ops[df_ops$exp == "(5) RH=79%",] %>%
   geom_line(
     aes(
       x = date,
-      y = gr10um_ref,
-      colour = "gr10um",
+      y = gr10_25um_ref,
+      colour = "gr10_25",
       linetype = reference
     ),
     lwd = 0.4,
@@ -4611,8 +4393,8 @@ p_3 <- df_ops[df_ops$exp == "(5) RH=79%",] %>%
     data = df_sensors_ft,
     aes(
       x = date,
-      y = gr10um,
-      colour = "gr10um",
+      y = gr10_25um,
+      colour = "gr10_25",
       linetype = reference
     ),
     lwd = 0.4,
@@ -4633,42 +4415,7 @@ p_3 <- df_ops[df_ops$exp == "(5) RH=79%",] %>%
   scale_y_log10()
 
 
-p_4 <- df_ops[df_ops$exp == "(5) RH=79%",] %>%
-  ggplot() +
-  geom_line(
-    aes(
-      x = date,
-      y = gr25um_ref,
-      colour = "gr25um",
-      linetype = reference
-    ),
-    lwd = 0.4,
-    colour = "#33A02C"
-  ) +
-  geom_line(
-    data = df_sensors_ft,
-    aes(
-      x = date,
-      y = gr25um,
-      colour = "gr25um",
-      linetype = reference
-    ),
-    lwd = 0.4,
-    colour = "#33A02C"
-  ) +
-  #scale_color_brewer(palette = "Paired") +
-  scale_fill_manual(values = group.colors) +
-  #  scale_fill_manual(values = c("#A6CEE3", "#1F78B4","#B2DF8A", "#A6CEE3", "#1F78B4","#B2DF8A")) +
-  custom_theme +
-  ylab(expression(paste(
-    "PNC (#/", cm ^ {
-      3
-    }, ")"
-  ))) +
-  xlab("Time of the day") +
-  annotation_logticks(sides = "l") +
-  labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+
 
 
 
@@ -4679,8 +4426,8 @@ p <- df_ops[df_ops$exp == "(5) RH=79%",] %>%
   geom_line(
     aes(
       x = date,
-      y = gr03um_ref,
-      colour = "gr03um - 0.3 to 10\u03bcm",
+      y = gr03_05um_ref,
+      colour = "gr03_05 - 0.3 to 0.5\u03bcm",
       linetype = reference
     ),
     lwd = 0.4
@@ -4688,16 +4435,16 @@ p <- df_ops[df_ops$exp == "(5) RH=79%",] %>%
   geom_line(
     aes(
       x = date,
-      y = gr05um_ref,
-      colour = "gr05um - 0.5 to 10\u03bcm",
+      y = gr05_10um_ref,
+      colour = "gr05_10 - 0.5 to 1\u03bcm",
       linetype = reference
     ),
     lwd = 0.4
   ) +
   geom_line(aes(
     x = date,
-    y = gr10um_ref,
-    colour = "gr10um - 1 to 10\u03bcm",
+    y = gr10_25um_ref,
+    colour = "gr10_25 - 1 to 2.5\u03bcm",
     linetype = reference
   ),
   lwd = 0.4) +
@@ -4705,8 +4452,8 @@ p <- df_ops[df_ops$exp == "(5) RH=79%",] %>%
     data = df_sensors_ft,
     aes(
       x = date,
-      y = gr03um,
-      colour = "gr03um - 0.3 to 10\u03bcm",
+      y = gr03_05um,
+      colour = "gr03_05 - 0.3 to 0.5\u03bcm",
       linetype = reference
     ),
     lwd = 0.4
@@ -4715,8 +4462,8 @@ p <- df_ops[df_ops$exp == "(5) RH=79%",] %>%
     data = df_sensors_ft,
     aes(
       x = date,
-      y = gr05um,
-      colour = "gr05um - 0.5 to 10\u03bcm",
+      y = gr05_10um,
+      colour = "gr05_10 - 0.5 to 1\u03bcm",
       linetype = reference
     ),
     lwd = 0.4
@@ -4725,27 +4472,8 @@ p <- df_ops[df_ops$exp == "(5) RH=79%",] %>%
     data = df_sensors_ft,
     aes(
       x = date,
-      y = gr10um,
-      colour = "gr10um - 1 to 10\u03bcm",
-      linetype = reference
-    ),
-    lwd = 0.4
-  ) +
-  geom_line(
-    aes(
-      x = date,
-      y = gr25um_ref,
-      colour = "gr25um - 2.5 to 10\u03bcm",
-      linetype = reference
-    ),
-    lwd = 0.4
-  ) +
-  geom_line(
-    data = df_sensors_ft,
-    aes(
-      x = date,
-      y = gr25um,
-      colour = "gr25um - 2.5 to 10\u03bcm",
+      y = gr10_25um,
+      colour = "gr10_25 - 1 to 2.5\u03bcm",
       linetype = reference
     ),
     lwd = 0.4
@@ -4787,19 +4515,23 @@ pl <- plot_grid(
   plot_grid(
     p_1 + theme(legend.position = "none"),
     p_2 + ylab(NULL) + theme(legend.position = "none"),
-    nrow = 1
-    #labels = c("(a)", "(b)", "(C)")
+    nrow = 1,
+    labels = c("(a)", "(b)"),
+    label_size = 9,
+    label_x = c(0,-0.034)
   ),
   plot_grid(
+    NULL,
     p_3 + theme(legend.position = "none"),
-    p_4 + theme(legend.position = "none"),
-    
-    #labels = c("", "(d)", "(e)", ""),
-    rel_widths = c(1, 1),
-    nrow = 1
+    NULL,
+    rel_widths = c(0.5, 1, 0.5),
+    labels = c("", "(c)", ""),
+    nrow = 1,
+    label_x = c(0,-0.034)
   ),
   nrow = 2
 )
+
 
 pl_legend <- plot_grid(pl,
                        legend,
@@ -4808,7 +4540,7 @@ pl_legend <- plot_grid(pl,
   theme(plot.background = element_rect(fill = "white", colour = NA))
 
 ggsave(
-  filename = "../output/plots/time_series_exp5_pms5003_25um_orig.png",
+  filename = "../output/plots/time_series_exp5_pms5003_25um_recalc.png",
   pl_legend,
   width = 200,
   units = "mm",

@@ -375,7 +375,13 @@ df_sensors[df_sensors$sensor_type == "PMS5003",] <-
   )
 
 
-p <- df_sensors %>%
+
+require(forcats)
+
+
+
+
+df_agg <- df_sensors %>%
   dplyr::filter(exp != "", source != "") %>%
   ungroup() %>%
   dplyr::filter(variation == "Stable") %>%
@@ -401,7 +407,20 @@ p <- df_sensors %>%
   ) %>%
   inner_join(dplyr::select(sensors_distrib, -particle_number),
              by = c("sensor_type", "bin_size")) %>%
-  mutate(dN_dlog = particle_number / (-diff_bin_dimension)) %>%
+  mutate(dN_dlog = particle_number / (-diff_bin_dimension)) 
+
+ops$sensor_type <- "TSI OPS 3330"
+
+df_agg <- bind_rows(df_agg, ops)
+
+
+df_agg$sensor_type <- fct_recode(df_agg$sensor_type,  `Alphasense OPC-R1` = "OPCR1",  `Plantower PMS5003 (x10)` = "PMS5003", `Sensirion SPS30 (x100)`= "SPS030")
+               
+ 
+df_agg$sensor_type <- fct_relevel(df_agg$sensor_type, "TSI OPS 3330", "Alphasense OPC-R1", "Sensirion SPS30 (x100)", "Plantower PMS5003 (x10)")   
+
+
+p <- df_agg %>%
   ggplot(aes(
     x = mean_bin_dimension,
     y = dN_dlog,
@@ -410,15 +429,15 @@ p <- df_sensors %>%
   )) +
   geom_line() +
   geom_point() +
-  geom_line(data = ops,
-            aes(
-              x = mean_bin_dimension,
-              y = dN_dlog,
-              colour = "OPS",
-              linetype = source
-            )) +
-  geom_point(data = ops,
-             aes(x = mean_bin_dimension, y = dN_dlog, colour = "OPS")) +
+  # geom_line(data = ops,
+  #           aes(
+  #             x = mean_bin_dimension,
+  #             y = dN_dlog,
+  #             colour = "OPS",
+  #             linetype = source
+  #           )) +
+  # geom_point(data = ops,
+  #            aes(x = mean_bin_dimension, y = dN_dlog, colour = "OPS")) +
   scale_y_log10(
     breaks = trans_breaks("log10", function(x)
       10 ^ x),

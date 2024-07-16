@@ -35,6 +35,7 @@ knitr::opts_chunk$set(fig.width=12, fig.height=8, fig.path='../docs/figs/time_se
 
 source("utilities.r")
 source("variables.r")
+require(scales)
 require(lubridate)
 require(cowplot)
 require(openair)
@@ -184,7 +185,8 @@ p_1 <- df_ops %>%
   ))) +
   xlab("Time of the day") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
+
 
 
 p_2 <- df_ops %>%
@@ -225,7 +227,7 @@ p_2 <- df_ops %>%
   ))) +
   xlab("Time of the day") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 
 p_3 <- df_ops %>%
@@ -267,7 +269,7 @@ p_3 <- df_ops %>%
   ))) +
   xlab("Time of the day") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 
 p_4 <- df_ops %>%
@@ -309,7 +311,7 @@ p_4 <- df_ops %>%
   ))) +
   xlab("Time of the day") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 
 p_5 <- df_ops %>%
@@ -351,7 +353,7 @@ p_5 <- df_ops %>%
   ))) +
   xlab("Time of the day") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 
 
@@ -461,7 +463,7 @@ p <- df_ops %>%
     ylab(expression(paste("PNC (#/",cm^{3},")"))) +
   xlab("Time of the day") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 p
 
@@ -503,7 +505,7 @@ pl <- plot_grid(
     p_1 + theme(legend.position = "none"),
     p_2 + ylab(NULL) + theme(legend.position = "none"),
     nrow = 1,
-    labels = c("(a)", "(b)", "(C)"),
+ #   labels = c("(a)", "(b)", "(C)"),
     label_size = 10,
     label_x = c(0,-0.037)
   ),
@@ -511,7 +513,7 @@ pl <- plot_grid(
     p_3 +  theme(legend.position = "none"),
     p_4 + ylab(NULL) + theme(legend.position = "none"),
     
-    labels = c("(c)", "(d)"),
+  #  labels = c("(c)", "(d)"),
     nrow = 1,
     label_size = 10,
     label_x = c(0,-0.037)
@@ -521,7 +523,7 @@ pl <- plot_grid(
     p_5 + theme(legend.position = "none"),
     NULL,
     rel_widths = c(0.5, 1, 0.5),
-    labels = c("", "(e)", ""),
+   # labels = c("", "(e)", ""),
     nrow = 1,
     label_size = 10
   ),
@@ -545,6 +547,8 @@ ggsave(
   units = "mm",
   height = 190
 )
+
+pl_legend
 
 ```
 
@@ -585,7 +589,7 @@ p_1 <- df_ops %>%
     aes(
       x = date,
       y = gr03_05um_ref,
-      colour = "gr03_05",
+      colour = "n03_05",
       linetype = reference
     ),
     lwd = 0.4,
@@ -596,7 +600,7 @@ p_1 <- df_ops %>%
     aes(
       x = date,
       y = gr03_05um,
-      colour = "gr03_05um",
+      colour = "n03_05",
       linetype = reference
     ),
     lwd = 0.4,
@@ -619,7 +623,7 @@ p_1 <- df_ops %>%
   xlab("Time of the day") +
   annotation_logticks(sides = "l") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 
 p_2 <- df_ops %>%
@@ -630,7 +634,7 @@ p_2 <- df_ops %>%
     aes(
       x = date,
       y = gr05_10um_ref,
-      colour = "gr05_10",
+      colour = "n05_10",
       linetype = reference
     ),
     lwd = 0.4,
@@ -641,7 +645,7 @@ p_2 <- df_ops %>%
     aes(
       x = date,
       y = gr05_10um,
-      colour = "gr05_10",
+      colour = "n05_10",
       linetype = reference
     ),
     lwd = 0.4,
@@ -664,7 +668,7 @@ p_2 <- df_ops %>%
   xlab("Time of the day") +
   annotation_logticks(sides = "l") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 
 
@@ -677,7 +681,7 @@ p_3 <- df_ops %>%
     aes(
       x = date,
       y = gr10_25um_ref,
-      colour = "gr10_25",
+      colour = "n10_25",
       linetype = reference
     ),
     lwd = 0.4,
@@ -688,7 +692,7 @@ p_3 <- df_ops %>%
     aes(
       x = date,
       y = gr10_25um,
-      colour = "gr10_25",
+      colour = "n10_25",
       linetype = reference
     ),
     lwd = 0.4,
@@ -711,7 +715,7 @@ p_3 <- df_ops %>%
   xlab("Time of the day") +
   annotation_logticks(sides = "l") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 
 
@@ -727,7 +731,7 @@ p <- df_ops %>%
     aes(
       x = date,
       y = gr03_05um_ref,
-      colour = "gr03_05 - 0.3 to 0.5\u03bcm",
+      colour = "n03_05 - 0.3 to 0.5\u03bcm",
       linetype = reference
     ),
     lwd = 0.4
@@ -736,7 +740,7 @@ p <- df_ops %>%
     aes(
       x = date,
       y = gr05_10um_ref,
-      colour = "gr05_10 - 0.5 to 1\u03bcm",
+      colour = "n05_10 - 0.5 to 1\u03bcm",
       linetype = reference
     ),
     lwd = 0.4
@@ -744,7 +748,7 @@ p <- df_ops %>%
   geom_line(aes(
     x = date,
     y = gr10_25um_ref,
-    colour = "gr10_25 - 1 to 2.5\u03bcm",
+    colour = "n10_25 - 1 to 2.5\u03bcm",
     linetype = reference
   ),
   lwd = 0.4) +
@@ -753,7 +757,7 @@ p <- df_ops %>%
     aes(
       x = date,
       y = gr03_05um,
-      colour = "gr03_05 - 0.3 to 0.5\u03bcm",
+      colour = "n03_05 - 0.3 to 0.5\u03bcm",
       linetype = reference
     ),
     lwd = 0.4
@@ -763,7 +767,7 @@ p <- df_ops %>%
     aes(
       x = date,
       y = gr05_10um,
-      colour = "gr05_10 - 0.5 to 1\u03bcm",
+      colour = "n05_10 - 0.5 to 1\u03bcm",
       linetype = reference
     ),
     lwd = 0.4
@@ -773,7 +777,7 @@ p <- df_ops %>%
     aes(
       x = date,
       y = gr10_25um,
-      colour = "gr10_25 - 1 to 2.5\u03bcm",
+      colour = "n10_25 - 1 to 2.5\u03bcm",
       linetype = reference
     ),
     lwd = 0.4
@@ -800,7 +804,7 @@ p <- df_ops %>%
   ))) +
   xlab("Time of the day") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 p
 
@@ -817,7 +821,7 @@ pl <- plot_grid(
     p_1 + theme(legend.position = "none"),
     p_2 + ylab(NULL) + theme(legend.position = "none"),
     nrow = 1,
-    labels = c("(a)", "(b)"),
+   # labels = c("(a)", "(b)"),
     label_size = 9,
     label_x = c(0,-0.034)
   ),
@@ -826,7 +830,7 @@ pl <- plot_grid(
     p_3 + theme(legend.position = "none"),
     NULL,
     rel_widths = c(0.5, 1, 0.5),
-    labels = c("", "(c)", ""),
+    #labels = c("", "(c)", ""),
     nrow = 1,
     label_x = c(0,-0.034)
   ),
@@ -900,7 +904,7 @@ p_1 <- df_ops %>%
   xlab("Time of the day") +
   annotation_logticks(sides = "l") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 
 p_2 <- df_ops %>%
@@ -937,7 +941,7 @@ p_2 <- df_ops %>%
   xlab("Time of the day") +
   annotation_logticks(sides = "l") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 
 
@@ -977,7 +981,7 @@ p_3 <- df_ops %>%
   xlab("Time of the day") +
   annotation_logticks(sides = "l") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 
 
@@ -1049,7 +1053,7 @@ p <- df_ops %>%
   ylab("PNC (#/cm3)") +
   xlab("Time of the day") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 p
 legend <-
   get_legend(p + theme(
@@ -1064,14 +1068,14 @@ pl <- plot_grid(
     p_1 + theme(legend.position = "none"),
     p_2 + ylab(NULL) + theme(legend.position = "none"),
     nrow = 1,
-    labels = c("(a)", "(b)"),
+  #  labels = c("(a)", "(b)"),
     label_size = 10
   ),
   plot_grid(
     NULL,
     p_3 + theme(legend.position = "none"),
     NULL,
-    labels = c("","(c)",""),
+  #  labels = c("","(c)",""),
     label_size = 10,
     rel_widths = c(0.5, 1, 0.5),
     nrow = 1
@@ -1177,7 +1181,7 @@ p_1 <- df_ops[df_ops$exp == "(1) RH=54%",] %>%
   ))) +
   xlab("Time of the day") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 
 p_2 <- df_ops[df_ops$exp == "(1) RH=54%",] %>%
@@ -1211,7 +1215,7 @@ p_2 <- df_ops[df_ops$exp == "(1) RH=54%",] %>%
   ))) +
   xlab("Time of the day") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 
 p_3 <- df_ops[df_ops$exp == "(1) RH=54%",] %>%
@@ -1246,7 +1250,7 @@ p_3 <- df_ops[df_ops$exp == "(1) RH=54%",] %>%
   ))) +
   xlab("Time of the day") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 
 p_4 <- df_ops[df_ops$exp == "(1) RH=54%",] %>%
@@ -1281,7 +1285,7 @@ p_4 <- df_ops[df_ops$exp == "(1) RH=54%",] %>%
   ))) +
   xlab("Time of the day") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 
 p_5 <- df_ops[df_ops$exp == "(1) RH=54%",] %>%
@@ -1316,7 +1320,7 @@ p_5 <- df_ops[df_ops$exp == "(1) RH=54%",] %>%
   ))) +
   xlab("Time of the day") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 
 
@@ -1423,7 +1427,7 @@ p <- df_ops[df_ops$exp == "(1) RH=54%",] %>%
   ))) +
   xlab("Time of the day") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 p
 
@@ -1548,7 +1552,7 @@ p_1 <- df_ops[df_ops$exp == "(3) RH=72%",] %>%
   ))) +
   xlab("Time of the day") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 
 p_2 <- df_ops[df_ops$exp == "(3) RH=72%",] %>%
@@ -1582,7 +1586,7 @@ p_2 <- df_ops[df_ops$exp == "(3) RH=72%",] %>%
   ))) +
   xlab("Time of the day") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 
 p_3 <- df_ops[df_ops$exp == "(3) RH=72%",] %>%
@@ -1617,7 +1621,7 @@ p_3 <- df_ops[df_ops$exp == "(3) RH=72%",] %>%
   ))) +
   xlab("Time of the day") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 
 p_4 <- df_ops[df_ops$exp == "(3) RH=72%",] %>%
@@ -1652,7 +1656,7 @@ p_4 <- df_ops[df_ops$exp == "(3) RH=72%",] %>%
   ))) +
   xlab("Time of the day") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 
 p_5 <- df_ops[df_ops$exp == "(3) RH=72%",] %>%
@@ -1687,7 +1691,7 @@ p_5 <- df_ops[df_ops$exp == "(3) RH=72%",] %>%
   ))) +
   xlab("Time of the day") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 
 
@@ -1794,7 +1798,7 @@ p <- df_ops[df_ops$exp == "(3) RH=72%",] %>%
   ))) +
   xlab("Time of the day") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 p
 
@@ -1920,7 +1924,7 @@ p_1 <- df_ops[df_ops$exp == "(4) RH=76%",] %>%
   ))) +
   xlab("Time of the day") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 
 p_2 <- df_ops[df_ops$exp == "(4) RH=76%",] %>%
@@ -1954,7 +1958,7 @@ p_2 <- df_ops[df_ops$exp == "(4) RH=76%",] %>%
   ))) +
   xlab("Time of the day") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 
 p_3 <- df_ops[df_ops$exp == "(4) RH=76%",] %>%
@@ -1989,7 +1993,7 @@ p_3 <- df_ops[df_ops$exp == "(4) RH=76%",] %>%
   ))) +
   xlab("Time of the day") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 
 p_4 <- df_ops[df_ops$exp == "(4) RH=76%",] %>%
@@ -2024,7 +2028,7 @@ p_4 <- df_ops[df_ops$exp == "(4) RH=76%",] %>%
   ))) +
   xlab("Time of the day") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 
 p_5 <- df_ops[df_ops$exp == "(4) RH=76%",] %>%
@@ -2059,7 +2063,7 @@ p_5 <- df_ops[df_ops$exp == "(4) RH=76%",] %>%
   ))) +
   xlab("Time of the day") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 
 
@@ -2166,7 +2170,7 @@ p <- df_ops[df_ops$exp == "(4) RH=76%",] %>%
   ))) +
   xlab("Time of the day") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 p
 
@@ -2292,7 +2296,7 @@ p_1 <- df_ops[df_ops$exp == "(5) RH=79%",] %>%
   ))) +
   xlab("Time of the day") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 
 p_2 <- df_ops[df_ops$exp == "(5) RH=79%",] %>%
@@ -2326,7 +2330,7 @@ p_2 <- df_ops[df_ops$exp == "(5) RH=79%",] %>%
   ))) +
   xlab("Time of the day") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 
 p_3 <- df_ops[df_ops$exp == "(5) RH=79%",] %>%
@@ -2361,7 +2365,7 @@ p_3 <- df_ops[df_ops$exp == "(5) RH=79%",] %>%
   ))) +
   xlab("Time of the day") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 
 p_4 <- df_ops[df_ops$exp == "(5) RH=79%",] %>%
@@ -2396,7 +2400,7 @@ p_4 <- df_ops[df_ops$exp == "(5) RH=79%",] %>%
   ))) +
   xlab("Time of the day") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 
 p_5 <- df_ops[df_ops$exp == "(5) RH=79%",] %>%
@@ -2431,7 +2435,7 @@ p_5 <- df_ops[df_ops$exp == "(5) RH=79%",] %>%
   ))) +
   xlab("Time of the day") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 
 
@@ -2538,7 +2542,7 @@ p <- df_ops[df_ops$exp == "(5) RH=79%",] %>%
   ))) +
   xlab("Time of the day") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 p
 
@@ -2626,7 +2630,7 @@ p_1 <- df_ops[df_ops$exp == "(1) RH=54%",] %>%
   xlab("Time of the day") +
   annotation_logticks(sides = "l") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 
 p_2 <- df_ops[df_ops$exp == "(1) RH=54%",] %>%
@@ -2656,7 +2660,7 @@ p_2 <- df_ops[df_ops$exp == "(1) RH=54%",] %>%
   xlab("Time of the day") +
   annotation_logticks(sides = "l") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 
 
@@ -2689,7 +2693,7 @@ p_3 <- df_ops[df_ops$exp == "(1) RH=54%",] %>%
   xlab("Time of the day") +
   annotation_logticks(sides = "l") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 
 
@@ -2754,7 +2758,7 @@ p <- df_ops[df_ops$exp == "(1) RH=54%",] %>%
   ylab("PNC (#/cm3)") +
   xlab("Time of the day") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 p
 legend <-
   get_legend(p + theme(
@@ -2837,7 +2841,7 @@ p_1 <- df_ops[df_ops$exp == "(3) RH=72%",] %>%
   xlab("Time of the day") +
   annotation_logticks(sides = "l") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 
 p_2 <- df_ops[df_ops$exp == "(3) RH=72%",] %>%
@@ -2867,7 +2871,7 @@ p_2 <- df_ops[df_ops$exp == "(3) RH=72%",] %>%
   xlab("Time of the day") +
   annotation_logticks(sides = "l") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 
 
@@ -2900,7 +2904,7 @@ p_3 <- df_ops[df_ops$exp == "(3) RH=72%",] %>%
   xlab("Time of the day") +
   annotation_logticks(sides = "l") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 
 
@@ -2965,7 +2969,7 @@ p <- df_ops[df_ops$exp == "(3) RH=72%",] %>%
   ylab("PNC (#/cm3)") +
   xlab("Time of the day") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 p
 legend <-
   get_legend(p + theme(
@@ -3048,7 +3052,7 @@ p_1 <- df_ops[df_ops$exp == "(4) RH=76%",] %>%
   xlab("Time of the day") +
   annotation_logticks(sides = "l") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 
 p_2 <- df_ops[df_ops$exp == "(4) RH=76%",] %>%
@@ -3078,7 +3082,7 @@ p_2 <- df_ops[df_ops$exp == "(4) RH=76%",] %>%
   xlab("Time of the day") +
   annotation_logticks(sides = "l") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 
 
@@ -3111,7 +3115,7 @@ p_3 <- df_ops[df_ops$exp == "(4) RH=76%",] %>%
   xlab("Time of the day") +
   annotation_logticks(sides = "l") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 
 
@@ -3176,7 +3180,7 @@ p <- df_ops[df_ops$exp == "(4) RH=76%",] %>%
   ylab("PNC (#/cm3)") +
   xlab("Time of the day") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 p
 legend <-
   get_legend(p + theme(
@@ -3260,7 +3264,7 @@ p_1 <- df_ops[df_ops$exp == "(5) RH=79%",] %>%
   xlab("Time of the day") +
   annotation_logticks(sides = "l") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 
 p_2 <- df_ops[df_ops$exp == "(5) RH=79%",] %>%
@@ -3290,7 +3294,7 @@ p_2 <- df_ops[df_ops$exp == "(5) RH=79%",] %>%
   xlab("Time of the day") +
   annotation_logticks(sides = "l") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 
 
@@ -3323,7 +3327,7 @@ p_3 <- df_ops[df_ops$exp == "(5) RH=79%",] %>%
   xlab("Time of the day") +
   annotation_logticks(sides = "l") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 
 
@@ -3388,7 +3392,7 @@ p <- df_ops[df_ops$exp == "(5) RH=79%",] %>%
   ylab("PNC (#/cm3)") +
   xlab("Time of the day") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 p
 legend <-
   get_legend(p + theme(
@@ -3470,7 +3474,7 @@ p_1 <- df_ops[df_ops$exp == "(1) RH=54%",] %>%
     aes(
       x = date,
       y = gr03_05um_ref,
-      colour = "gr03_05",
+      colour = "n03_05",
       linetype = reference
     ),
     lwd = 0.4,
@@ -3481,7 +3485,7 @@ p_1 <- df_ops[df_ops$exp == "(1) RH=54%",] %>%
     aes(
       x = date,
       y = gr03_05um,
-      colour = "gr03_05",
+      colour = "n03_05",
       linetype = reference
     ),
     lwd = 0.4,
@@ -3499,7 +3503,7 @@ p_1 <- df_ops[df_ops$exp == "(1) RH=54%",] %>%
   xlab("Time of the day") +
   annotation_logticks(sides = "l") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 
 p_2 <- df_ops[df_ops$exp == "(1) RH=54%",] %>%
@@ -3508,7 +3512,7 @@ p_2 <- df_ops[df_ops$exp == "(1) RH=54%",] %>%
     aes(
       x = date,
       y = gr05_10um_ref,
-      colour = "gr05_10",
+      colour = "n05_10",
       linetype = reference
     ),
     lwd = 0.4,
@@ -3519,7 +3523,7 @@ p_2 <- df_ops[df_ops$exp == "(1) RH=54%",] %>%
     aes(
       x = date,
       y = gr05_10um,
-      colour = "gr05_10",
+      colour = "n05_10",
       linetype = reference
     ),
     lwd = 0.4,
@@ -3537,7 +3541,7 @@ p_2 <- df_ops[df_ops$exp == "(1) RH=54%",] %>%
   xlab("Time of the day") +
   annotation_logticks(sides = "l") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 
 
@@ -3548,7 +3552,7 @@ p_3 <- df_ops[df_ops$exp == "(1) RH=54%",] %>%
     aes(
       x = date,
       y = gr10_25um_ref,
-      colour = "gr10_25",
+      colour = "n10_25",
       linetype = reference
     ),
     lwd = 0.4,
@@ -3559,7 +3563,7 @@ p_3 <- df_ops[df_ops$exp == "(1) RH=54%",] %>%
     aes(
       x = date,
       y = gr10_25um,
-      colour = "gr10_25",
+      colour = "n10_25",
       linetype = reference
     ),
     lwd = 0.4,
@@ -3577,7 +3581,7 @@ p_3 <- df_ops[df_ops$exp == "(1) RH=54%",] %>%
   xlab("Time of the day") +
   annotation_logticks(sides = "l") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 
 
@@ -3592,7 +3596,7 @@ p <- df_ops[df_ops$exp == "(1) RH=54%",] %>%
     aes(
       x = date,
       y = gr03_05um_ref,
-      colour = "gr03_05 - 0.3 to 0.5\u03bcm",
+      colour = "n03_05 - 0.3 to 0.5\u03bcm",
       linetype = reference
     ),
     lwd = 0.4
@@ -3601,7 +3605,7 @@ p <- df_ops[df_ops$exp == "(1) RH=54%",] %>%
     aes(
       x = date,
       y = gr05_10um_ref,
-      colour = "gr05_10 - 0.5 to 1\u03bcm",
+      colour = "n05_10 - 0.5 to 1\u03bcm",
       linetype = reference
     ),
     lwd = 0.4
@@ -3609,7 +3613,7 @@ p <- df_ops[df_ops$exp == "(1) RH=54%",] %>%
   geom_line(aes(
     x = date,
     y = gr10_25um_ref,
-    colour = "gr10_25 - 1 to 2.5\u03bcm",
+    colour = "n10_25 - 1 to 2.5\u03bcm",
     linetype = reference
   ),
   lwd = 0.4) +
@@ -3618,7 +3622,7 @@ p <- df_ops[df_ops$exp == "(1) RH=54%",] %>%
     aes(
       x = date,
       y = gr03_05um,
-      colour = "gr03_05 - 0.3 to 0.5\u03bcm",
+      colour = "n03_05 - 0.3 to 0.5\u03bcm",
       linetype = reference
     ),
     lwd = 0.4
@@ -3628,7 +3632,7 @@ p <- df_ops[df_ops$exp == "(1) RH=54%",] %>%
     aes(
       x = date,
       y = gr05_10um,
-      colour = "gr05_10 - 0.5 to 1\u03bcm",
+      colour = "n05_10 - 0.5 to 1\u03bcm",
       linetype = reference
     ),
     lwd = 0.4
@@ -3638,7 +3642,7 @@ p <- df_ops[df_ops$exp == "(1) RH=54%",] %>%
     aes(
       x = date,
       y = gr10_25um,
-      colour = "gr10_25 - 1 to 2.5\u03bcm",
+      colour = "n10_25 - 1 to 2.5\u03bcm",
       linetype = reference
     ),
     lwd = 0.4
@@ -3660,7 +3664,7 @@ p <- df_ops[df_ops$exp == "(1) RH=54%",] %>%
   ))) +
   xlab("Time of the day") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 
 
@@ -3750,7 +3754,7 @@ p_1 <- df_ops[df_ops$exp == "(3) RH=72%",] %>%
     aes(
       x = date,
       y = gr03_05um_ref,
-      colour = "gr03_05",
+      colour = "n03_05",
       linetype = reference
     ),
     lwd = 0.4,
@@ -3761,7 +3765,7 @@ p_1 <- df_ops[df_ops$exp == "(3) RH=72%",] %>%
     aes(
       x = date,
       y = gr03_05um,
-      colour = "gr03_05",
+      colour = "n03_05",
       linetype = reference
     ),
     lwd = 0.4,
@@ -3779,7 +3783,7 @@ p_1 <- df_ops[df_ops$exp == "(3) RH=72%",] %>%
   xlab("Time of the day") +
   annotation_logticks(sides = "l") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 
 p_2 <- df_ops[df_ops$exp == "(3) RH=72%",] %>%
@@ -3788,7 +3792,7 @@ p_2 <- df_ops[df_ops$exp == "(3) RH=72%",] %>%
     aes(
       x = date,
       y = gr05_10um_ref,
-      colour = "gr05_10",
+      colour = "n05_10",
       linetype = reference
     ),
     lwd = 0.4,
@@ -3799,7 +3803,7 @@ p_2 <- df_ops[df_ops$exp == "(3) RH=72%",] %>%
     aes(
       x = date,
       y = gr05_10um,
-      colour = "gr05_10",
+      colour = "n05_10",
       linetype = reference
     ),
     lwd = 0.4,
@@ -3817,7 +3821,7 @@ p_2 <- df_ops[df_ops$exp == "(3) RH=72%",] %>%
   xlab("Time of the day") +
   annotation_logticks(sides = "l") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 
 
@@ -3828,7 +3832,7 @@ p_3 <- df_ops[df_ops$exp == "(3) RH=72%",] %>%
     aes(
       x = date,
       y = gr10_25um_ref,
-      colour = "gr10_25",
+      colour = "n10_25",
       linetype = reference
     ),
     lwd = 0.4,
@@ -3839,7 +3843,7 @@ p_3 <- df_ops[df_ops$exp == "(3) RH=72%",] %>%
     aes(
       x = date,
       y = gr10_25um,
-      colour = "gr10_25",
+      colour = "n10_25",
       linetype = reference
     ),
     lwd = 0.4,
@@ -3857,7 +3861,7 @@ p_3 <- df_ops[df_ops$exp == "(3) RH=72%",] %>%
   xlab("Time of the day") +
   annotation_logticks(sides = "l") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 
 
@@ -3870,7 +3874,7 @@ p <- df_ops[df_ops$exp == "(3) RH=72%",] %>%
     aes(
       x = date,
       y = gr03_05um_ref,
-      colour = "gr03_05 - 0.3 to 0.5\u03bcm",
+      colour = "n03_05 - 0.3 to 0.5\u03bcm",
       linetype = reference
     ),
     lwd = 0.4
@@ -3879,7 +3883,7 @@ p <- df_ops[df_ops$exp == "(3) RH=72%",] %>%
     aes(
       x = date,
       y = gr05_10um_ref,
-      colour = "gr05_10 - 0.5 to 1\u03bcm",
+      colour = "n05_10 - 0.5 to 1\u03bcm",
       linetype = reference
     ),
     lwd = 0.4
@@ -3887,7 +3891,7 @@ p <- df_ops[df_ops$exp == "(3) RH=72%",] %>%
   geom_line(aes(
     x = date,
     y = gr10_25um_ref,
-    colour = "gr10_25 - 1 to 2.5\u03bcm",
+    colour = "n10_25 - 1 to 2.5\u03bcm",
     linetype = reference
   ),
   lwd = 0.4) +
@@ -3896,7 +3900,7 @@ p <- df_ops[df_ops$exp == "(3) RH=72%",] %>%
     aes(
       x = date,
       y = gr03_05um,
-      colour = "gr03_05 - 0.3 to 0.5\u03bcm",
+      colour = "n03_05 - 0.3 to 0.5\u03bcm",
       linetype = reference
     ),
     lwd = 0.4
@@ -3906,7 +3910,7 @@ p <- df_ops[df_ops$exp == "(3) RH=72%",] %>%
     aes(
       x = date,
       y = gr05_10um,
-      colour = "gr05_10 - 0.5 to 1\u03bcm",
+      colour = "n05_10 - 0.5 to 1\u03bcm",
       linetype = reference
     ),
     lwd = 0.4
@@ -3916,7 +3920,7 @@ p <- df_ops[df_ops$exp == "(3) RH=72%",] %>%
     aes(
       x = date,
       y = gr10_25um,
-      colour = "gr10_25 - 1 to 2.5\u03bcm",
+      colour = "n10_25 - 1 to 2.5\u03bcm",
       linetype = reference
     ),
     lwd = 0.4
@@ -3938,7 +3942,7 @@ p <- df_ops[df_ops$exp == "(3) RH=72%",] %>%
   ))) +
   xlab("Time of the day") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 
 
@@ -4027,7 +4031,7 @@ p_1 <- df_ops[df_ops$exp == "(4) RH=76%",] %>%
     aes(
       x = date,
       y = gr03_05um_ref,
-      colour = "gr03_05",
+      colour = "n03_05",
       linetype = reference
     ),
     lwd = 0.4,
@@ -4038,7 +4042,7 @@ p_1 <- df_ops[df_ops$exp == "(4) RH=76%",] %>%
     aes(
       x = date,
       y = gr03_05um,
-      colour = "gr03_05",
+      colour = "n03_05",
       linetype = reference
     ),
     lwd = 0.4,
@@ -4056,7 +4060,7 @@ p_1 <- df_ops[df_ops$exp == "(4) RH=76%",] %>%
   xlab("Time of the day") +
   annotation_logticks(sides = "l") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 
 p_2 <- df_ops[df_ops$exp == "(4) RH=76%",] %>%
@@ -4065,7 +4069,7 @@ p_2 <- df_ops[df_ops$exp == "(4) RH=76%",] %>%
     aes(
       x = date,
       y = gr05_10um_ref,
-      colour = "gr05_10",
+      colour = "n05_10",
       linetype = reference
     ),
     lwd = 0.4,
@@ -4076,7 +4080,7 @@ p_2 <- df_ops[df_ops$exp == "(4) RH=76%",] %>%
     aes(
       x = date,
       y = gr05_10um,
-      colour = "gr05_10",
+      colour = "n05_10",
       linetype = reference
     ),
     lwd = 0.4,
@@ -4094,7 +4098,7 @@ p_2 <- df_ops[df_ops$exp == "(4) RH=76%",] %>%
   xlab("Time of the day") +
   annotation_logticks(sides = "l") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 
 
@@ -4105,7 +4109,7 @@ p_3 <- df_ops[df_ops$exp == "(4) RH=76%",] %>%
     aes(
       x = date,
       y = gr10_25um_ref,
-      colour = "gr10_25",
+      colour = "n10_25",
       linetype = reference
     ),
     lwd = 0.4,
@@ -4116,7 +4120,7 @@ p_3 <- df_ops[df_ops$exp == "(4) RH=76%",] %>%
     aes(
       x = date,
       y = gr10_25um,
-      colour = "gr10_25",
+      colour = "n10_25",
       linetype = reference
     ),
     lwd = 0.4,
@@ -4134,7 +4138,7 @@ p_3 <- df_ops[df_ops$exp == "(4) RH=76%",] %>%
   xlab("Time of the day") +
   annotation_logticks(sides = "l") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 
 
@@ -4146,7 +4150,7 @@ p <- df_ops[df_ops$exp == "(4) RH=76%",] %>%
     aes(
       x = date,
       y = gr03_05um_ref,
-      colour = "gr03_05 - 0.3 to 0.5\u03bcm",
+      colour = "n03_05 - 0.3 to 0.5\u03bcm",
       linetype = reference
     ),
     lwd = 0.4
@@ -4155,7 +4159,7 @@ p <- df_ops[df_ops$exp == "(4) RH=76%",] %>%
     aes(
       x = date,
       y = gr05_10um_ref,
-      colour = "gr05_10 - 0.5 to 1\u03bcm",
+      colour = "n05_10 - 0.5 to 1\u03bcm",
       linetype = reference
     ),
     lwd = 0.4
@@ -4163,7 +4167,7 @@ p <- df_ops[df_ops$exp == "(4) RH=76%",] %>%
   geom_line(aes(
     x = date,
     y = gr10_25um_ref,
-    colour = "gr10_25 - 1 to 2.5\u03bcm",
+    colour = "n10_25 - 1 to 2.5\u03bcm",
     linetype = reference
   ),
   lwd = 0.4) +
@@ -4172,7 +4176,7 @@ p <- df_ops[df_ops$exp == "(4) RH=76%",] %>%
     aes(
       x = date,
       y = gr03_05um,
-      colour = "gr03_05 - 0.3 to 0.5\u03bcm",
+      colour = "n03_05 - 0.3 to 0.5\u03bcm",
       linetype = reference
     ),
     lwd = 0.4
@@ -4182,7 +4186,7 @@ p <- df_ops[df_ops$exp == "(4) RH=76%",] %>%
     aes(
       x = date,
       y = gr05_10um,
-      colour = "gr05_10 - 0.5 to 1\u03bcm",
+      colour = "n05_10 - 0.5 to 1\u03bcm",
       linetype = reference
     ),
     lwd = 0.4
@@ -4192,7 +4196,7 @@ p <- df_ops[df_ops$exp == "(4) RH=76%",] %>%
     aes(
       x = date,
       y = gr10_25um,
-      colour = "gr10_25 - 1 to 2.5\u03bcm",
+      colour = "n10_25 - 1 to 2.5\u03bcm",
       linetype = reference
     ),
     lwd = 0.4
@@ -4214,7 +4218,7 @@ p <- df_ops[df_ops$exp == "(4) RH=76%",] %>%
   ))) +
   xlab("Time of the day") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 
 
@@ -4305,7 +4309,7 @@ p_1 <- df_ops[df_ops$exp == "(5) RH=79%",] %>%
     aes(
       x = date,
       y = gr03_05um_ref,
-      colour = "gr03_05",
+      colour = "n03_05",
       linetype = reference
     ),
     lwd = 0.4,
@@ -4316,7 +4320,7 @@ p_1 <- df_ops[df_ops$exp == "(5) RH=79%",] %>%
     aes(
       x = date,
       y = gr03_05um,
-      colour = "gr03_05",
+      colour = "n03_05",
       linetype = reference
     ),
     lwd = 0.4,
@@ -4334,7 +4338,7 @@ p_1 <- df_ops[df_ops$exp == "(5) RH=79%",] %>%
   xlab("Time of the day") +
   annotation_logticks(sides = "l") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 
 p_2 <- df_ops[df_ops$exp == "(5) RH=79%",] %>%
@@ -4343,7 +4347,7 @@ p_2 <- df_ops[df_ops$exp == "(5) RH=79%",] %>%
     aes(
       x = date,
       y = gr05_10um_ref,
-      colour = "gr05_10",
+      colour = "n05_10",
       linetype = reference
     ),
     lwd = 0.4,
@@ -4354,7 +4358,7 @@ p_2 <- df_ops[df_ops$exp == "(5) RH=79%",] %>%
     aes(
       x = date,
       y = gr05_10um,
-      colour = "gr05_10",
+      colour = "n05_10",
       linetype = reference
     ),
     lwd = 0.4,
@@ -4372,7 +4376,7 @@ p_2 <- df_ops[df_ops$exp == "(5) RH=79%",] %>%
   xlab("Time of the day") +
   annotation_logticks(sides = "l") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 
 
@@ -4383,7 +4387,7 @@ p_3 <- df_ops[df_ops$exp == "(5) RH=79%",] %>%
     aes(
       x = date,
       y = gr10_25um_ref,
-      colour = "gr10_25",
+      colour = "n10_25",
       linetype = reference
     ),
     lwd = 0.4,
@@ -4394,7 +4398,7 @@ p_3 <- df_ops[df_ops$exp == "(5) RH=79%",] %>%
     aes(
       x = date,
       y = gr10_25um,
-      colour = "gr10_25",
+      colour = "n10_25",
       linetype = reference
     ),
     lwd = 0.4,
@@ -4412,7 +4416,7 @@ p_3 <- df_ops[df_ops$exp == "(5) RH=79%",] %>%
   xlab("Time of the day") +
   annotation_logticks(sides = "l") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 
 
@@ -4427,7 +4431,7 @@ p <- df_ops[df_ops$exp == "(5) RH=79%",] %>%
     aes(
       x = date,
       y = gr03_05um_ref,
-      colour = "gr03_05 - 0.3 to 0.5\u03bcm",
+      colour = "n03_05 - 0.3 to 0.5\u03bcm",
       linetype = reference
     ),
     lwd = 0.4
@@ -4436,7 +4440,7 @@ p <- df_ops[df_ops$exp == "(5) RH=79%",] %>%
     aes(
       x = date,
       y = gr05_10um_ref,
-      colour = "gr05_10 - 0.5 to 1\u03bcm",
+      colour = "n05_10 - 0.5 to 1\u03bcm",
       linetype = reference
     ),
     lwd = 0.4
@@ -4444,7 +4448,7 @@ p <- df_ops[df_ops$exp == "(5) RH=79%",] %>%
   geom_line(aes(
     x = date,
     y = gr10_25um_ref,
-    colour = "gr10_25 - 1 to 2.5\u03bcm",
+    colour = "n10_25 - 1 to 2.5\u03bcm",
     linetype = reference
   ),
   lwd = 0.4) +
@@ -4453,7 +4457,7 @@ p <- df_ops[df_ops$exp == "(5) RH=79%",] %>%
     aes(
       x = date,
       y = gr03_05um,
-      colour = "gr03_05 - 0.3 to 0.5\u03bcm",
+      colour = "n03_05 - 0.3 to 0.5\u03bcm",
       linetype = reference
     ),
     lwd = 0.4
@@ -4463,7 +4467,7 @@ p <- df_ops[df_ops$exp == "(5) RH=79%",] %>%
     aes(
       x = date,
       y = gr05_10um,
-      colour = "gr05_10 - 0.5 to 1\u03bcm",
+      colour = "n05_10 - 0.5 to 1\u03bcm",
       linetype = reference
     ),
     lwd = 0.4
@@ -4473,7 +4477,7 @@ p <- df_ops[df_ops$exp == "(5) RH=79%",] %>%
     aes(
       x = date,
       y = gr10_25um,
-      colour = "gr10_25 - 1 to 2.5\u03bcm",
+      colour = "n10_25 - 1 to 2.5\u03bcm",
       linetype = reference
     ),
     lwd = 0.4
@@ -4495,7 +4499,7 @@ p <- df_ops[df_ops$exp == "(5) RH=79%",] %>%
   ))) +
   xlab("Time of the day") +
   labs(colour = "Bin sizes", linetype = "Instrument") +
-  scale_y_log10()
+  scale_y_log10(labels = comma) 
 
 
 
